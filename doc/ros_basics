@@ -1,0 +1,19 @@
+Last Updated May-30-2017
+Author: Joseph Cullen - Software Team Leader <Joseph.Cullen@stonybrook.edu>
+
+ROS basics
+================================================================================
+
+This will be fleshed out as I figure more stuff out.
+
+
+$ roscore
+Running this starts the ROS process. This needs to run for other ROS things to work. Currently I just have it running in a separate terminal. At some point I will attempt to get the project to launch this automatically. I do not know how to kill roscore cleanly right now. I am using ctrl-c to kill it right now.
+
+ROS acts as an intermediary beetween various ROS processes. There seems to be two sets of data sources in ROS: (publisher and subscriber) and (service and client). 
+
+A publisher will publish data with a certain "signature" that any subscriber can process in the order it came in. A publisher can have a certain size buffer of how much data to store before old data starts being overwritte.
+
+A service and client both will hang when trying to send or request data until the respective service/client has the data available.
+
+

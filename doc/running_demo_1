@@ -1,0 +1,41 @@
+Last Updated May-30-2017
+Author: Joseph Cullen - Software Team Leader <Joseph.Cullen@stonybrook.edu>
+
+Running Demo 1
+================================================================================
+
+Demo 1 is located in src/beginner/tutorials/src. I created it by following the following tutorials.
+
+http://wiki.ros.org/ROS/Tutorials/CreatingPackage
+http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
+
+Their folder structure will probably get reorgnaized soon.
+
+With roscore running in a separate terminal and while you are at the top level of the directory (ls should diplsy, build, devel, doc, scripts...)
+
+$ source devel/setup.bash
+$ catkin_make
+
+In 2 separate terminal windows:
+$ source devel/setup.bash
+$ rosrun beginner_tutorials listener
+
+AND
+
+$ source devel/setup.bash
+$ rosrun beginner_tutorials talker
+
+
+This means you have at least 3 terminals open right now. One for roscore. One for the talker and one for the listener. Talker should be spamming the console with
+[ INFO] [1496168776.752961102]: hello world 3279
+
+Listener with
+[ INFO] [1496168776.653306105]: I heard: [hello world 3278]
+
+ctrl-c to kill these.
+
+The source for these are in src/beginner_tutorials/src
+
+I will look into finding a way to launch roscore and these 2 automatically. 
+
+This demonstrates how messages are sent between components which are equivalent to modules from the robot last year.

@@ -9,12 +9,21 @@ Running Demo 1
 EASY WAY
 ================================================================================
 
+Build the code:
 
 $ catkin_make
+
+Let ROS know that this directory has ROS code in it
+
 $ source devel/setup.bash 
+
+Launch ROS with the specified modules and params in launch/tutorial.launch. This file is short and human readable if you are curious what it looks like.
+
+Look at the 2 files in src/beginner_tutorials/src These are 2 short files that show how to get modules to communicate to each other
+
 $ roslaunch launch/tutorial.launch 
 
-CTRL-C to kill
+CTRL-C to kill 
 
 Output should look something like this. 
 
@@ -29,6 +38,9 @@ Output should look something like this.
 [ INFO] [1496271343.121305027]: I heard: [hello world 14]
 [ INFO] [1496271343.221384427]: hello world 15
 [ INFO] [1496271343.221713244]: I heard: [hello world 15]
+
+
+
 
 
 

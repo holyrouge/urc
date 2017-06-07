@@ -4,6 +4,29 @@ Author: Joseph Cullen - Software Team Leader <Joseph.Cullen@stonybrook.edu>
 Running Demo 1
 ================================================================================
 
+================================================================================
+EASIEST WAY
+================================================================================
+
+From the top level folder (urc2018)
+
+$ ./scripts/run_tutorial
+
+CTRL-C to kill 
+
+Output should look something like this. 
+
+[ INFO] [1496271342.721782081]: I heard: [hello world 10]
+[ INFO] [1496271342.820515569]: hello world 11
+[ INFO] [1496271342.820805542]: I heard: [hello world 11]
+[ INFO] [1496271342.920715806]: hello world 12
+[ INFO] [1496271342.920981006]: I heard: [hello world 12]
+[ INFO] [1496271343.021299846]: hello world 13
+[ INFO] [1496271343.021566733]: I heard: [hello world 13]
+[ INFO] [1496271343.121033022]: hello world 14
+[ INFO] [1496271343.121305027]: I heard: [hello world 14]
+[ INFO] [1496271343.221384427]: hello world 15
+[ INFO] [1496271343.221713244]: I heard: [hello world 15]
 
 ================================================================================
 EASY WAY

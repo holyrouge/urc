@@ -5,6 +5,9 @@
 
 #include <sstream>
 
+//The Num.h file was automatically generated
+#include "beginner_tutorials/coord.h"
+
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
@@ -51,6 +54,9 @@ int main(int argc, char **argv)
   ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
   ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
 
+
+  ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
+
   ros::Rate loop_rate(10);
 
   /**
@@ -83,6 +89,11 @@ int main(int argc, char **argv)
     std_msgs::Int8 msg_int;
     msg_int.data = std::rand() % 100;
     chatter_pub_int.publish(msg_int);
+
+    beginner_tutorials::coord data;
+    data.x=50; 
+    data.y=100;
+    chatter_struct.publish(data);
 
     ros::spinOnce();
 

@@ -2,6 +2,8 @@
 #include "std_msgs/String.h"
 #include <std_msgs/Int8.h>
 
+#include "beginner_tutorials/coord.h"
+
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
  */
@@ -15,6 +17,12 @@ void chatterCallback_int(const std_msgs::Int8::ConstPtr& msg)
 {
   ROS_INFO("Random number: [%d]", msg->data);
 }
+
+void chatterCallback_struct(const beginner_tutorials::coord::ConstPtr& msg)
+{
+  ROS_INFO("Coord is: [%d, %d]", msg->x, msg->y);
+}
+
 int main(int argc, char **argv)
 {
   /**
@@ -56,6 +64,7 @@ int main(int argc, char **argv)
   // 'chatterCallback' is the function that will AUTOMATICALLY called whenever a message occurs
   ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
   ros::Subscriber sub_int = n.subscribe("chatter_int", 1000, chatterCallback_int);
+  ros::Subscriber sub_struct = n.subscribe("chatter_struct", 1000, chatterCallback_struct);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all

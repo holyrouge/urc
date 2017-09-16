@@ -78,6 +78,10 @@ http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
 
 Their folder structure will probably get reorgnaized soon.
 
+Run roscore in its own terminal window
+
+$ roscore
+
 With roscore running in a separate terminal and while you are at the top level of the directory (ls should diplsy, build, devel, doc, scripts...)
 
 $ source devel/setup.bash
@@ -103,4 +107,25 @@ ctrl-c to kill these.
 
 The source for these are in src/beginner_tutorials/src
 
-This demonstrates how messages are sent between components which are equivalent to modules from the robot last year.
+This demonstrates how messages are sent between components which are equivalent to modules from the robot last year. Look at the source code for these files in src/beginner_tutorials/src/listener.cpp and talker.cpp
+
+================================================================================
+Not neccesary for most members to know
+================================================================================
+
+in src/beginner_tutorials/CMakeLists.txt and src/beginner_tutorials/package.xml is how these can build and launch easily as a set in the easy version of this tutorial. That is how we would want it to launch when we are testing the robot. At the end of the CMakeLists.txt is 
+These tell it that these are both what needs to be built.
+********************************************************************************
+add_executable(talker src/talker.cpp)
+target_link_libraries(talker ${catkin_LIBRARIES})
+add_dependencies(talker beginner_tutorials_generate_messages_cpp)
+
+add_executable(listener src/listener.cpp)
+target_link_libraries(listener ${catkin_LIBRARIES})
+add_dependencies(listener beginner_tutorials_generate_messages_cpp)
+********************************************************************************
+
+
+
+
+The file: launch/tutorial.launch is used to tell both of these to launch along with ROS. Most of these files could be copy and pasted with slight modifications to add more modules for different tests.

@@ -1,14 +1,20 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <std_msgs/Int8.h>
 
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
  */
 void chatterCallback(const std_msgs::String::ConstPtr& msg)
 {
-  ROS_INFO("I heard: [%s]", msg->data.c_str());
+  ROS_INFO("I heard the string: [%s]", msg->data.c_str());
 }
 
+
+void chatterCallback_int(const std_msgs::Int8::ConstPtr& msg)
+{
+  ROS_INFO("Random number: [%d]", msg->data);
+}
 int main(int argc, char **argv)
 {
   /**
@@ -45,7 +51,11 @@ int main(int argc, char **argv)
    * is the number of messages that will be buffered up before beginning to throw
    * away the oldest ones.
    */
+
+  // "chatter" is the name of the 'channel'. Looking for someone publishing something on "chatter".
+  // 'chatterCallback' is the function that will AUTOMATICALLY called whenever a message occurs
   ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
+  ros::Subscriber sub_int = n.subscribe("chatter_int", 1000, chatterCallback_int);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all

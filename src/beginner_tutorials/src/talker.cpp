@@ -1,5 +1,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <std_msgs/Int8.h>
+#include <stdlib.h>
 
 #include <sstream>
 
@@ -44,7 +46,10 @@ int main(int argc, char **argv)
    * than we can send them, the number here specifies how many messages to
    * buffer up before throwing some away.
    */
+
+  // "chatter" is the name of the 'channel' of communication. The listener will be looking for one called "chatter"
   ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+  ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
 
   ros::Rate loop_rate(10);
 
@@ -66,6 +71,7 @@ int main(int argc, char **argv)
 
     ROS_INFO("%s", msg.data.c_str());
 
+
     /**
      * The publish() function is how you send messages. The parameter
      * is the message object. The type of this object must agree with the type
@@ -73,6 +79,10 @@ int main(int argc, char **argv)
      * in the constructor above.
      */
     chatter_pub.publish(msg);
+
+    std_msgs::Int8 msg_int;
+    msg_int.data = std::rand() % 100;
+    chatter_pub_int.publish(msg_int);
 
     ros::spinOnce();
 

@@ -16,4 +16,18 @@ $ sudo apt-get install ros-kinetic-ros-tutorials
 
 http://gazebosim.org/tutorials?tut=ros_urdf&cat=connect_ros
 
+
+http://wiki.ros.org/ROS/Concepts
 -------------------------------------------------------------------------------
+
+http://wiki.ros.org/ROS/Tutorials/CreatingMsgAndSrv
+
+## Generate messages in the 'msg' folder
+  add_message_files(
+    FILES
+    coord.msg
+  )
+  in CMakeLists
+
+
+  https://answers.ros.org/question/60614/how-to-publish-a-vector-of-unknown-length-of-structs-in-ros/

@@ -7,6 +7,8 @@
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
  */
+
+// Functions for 
 void chatterCallback(const std_msgs::String::ConstPtr& msg)
 {
   ROS_INFO("I heard the string: [%s]", msg->data.c_str());

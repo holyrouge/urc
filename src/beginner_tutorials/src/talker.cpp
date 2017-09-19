@@ -1,12 +1,16 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
-#include <std_msgs/Int8.h>
 #include <stdlib.h>
-
 #include <sstream>
 
-//The Num.h file was automatically generated
-#include "beginner_tutorials/coord.h"
+
+/**
+ * Make sure to include the standard types for any messages you send and any
+ * custom types that you define in .msg files (the .h files should be auto
+ * build from the .msg files)
+ */
+#include <std_msgs/String.h>
+#include <std_msgs/Int8.h>
+#include "beginner_tutorials/coord.h" // see beginner_tutorials/msg/coord.msg
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
@@ -50,11 +54,10 @@ int main(int argc, char **argv)
    * buffer up before throwing some away.
    */
 
-  // "chatter" is the name of the 'channel' of communication. The listener will be looking for one called "chatter"
+  // "chatter" is the name of the 'channel' of communication. The listener will 
+  // be looking for one called "chatter" for the string type for example
   ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
   ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
-
-
   ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
 
   ros::Rate loop_rate(10);
@@ -86,15 +89,18 @@ int main(int argc, char **argv)
      */
     chatter_pub.publish(msg);
 
+    // Do the same except generate a random int
     std_msgs::Int8 msg_int;
     msg_int.data = std::rand() % 100;
     chatter_pub_int.publish(msg_int);
 
-    beginner_tutorials::coord data;
-    data.x=50; 
-    data.y=100;
-    chatter_struct.publish(data);
+    // Do the same except send a set of data with arbitrary types (this must be predefined in a .msg file)
+    beginner_tutorials::coord coord_data;
+    coord_data.x=50; 
+    coord_data.y=100;
+    chatter_struct.publish(coord_data);
 
+    // Call this at end of "doing stuff"
     ros::spinOnce();
 
     loop_rate.sleep();

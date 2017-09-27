@@ -1,5 +1,13 @@
-Last Updated May-30-2017
+Last Updated Sep-26-2017
 Author: Joseph Cullen - Software Team Leader <Joseph.Cullen@stonybrook.edu>
+================================================================================
+
+From the top level folder (urc2018 probably) try running:
+$ ./scripts/scripts/quick_install.sh
+
+If this doesn't work then try manually going through the instructions below 
+(and tell me if you figured out what went wrong so this guide/script can be
+improved)
 
 Guide for setting up ROS with Gazebo
 ================================================================================

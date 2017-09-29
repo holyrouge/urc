@@ -3,19 +3,19 @@ Author: Joseph Cullen - Software Team Leader <Joseph.Cullen@stonybrook.edu>
 ================================================================================
 
 From the top level folder (urc2018 probably) try running:
-$ ./scripts/scripts/quick_install.sh
+$ ./scripts/quick_install.sh
 
-If this doesn't work then try manually going through the instructions below 
+If this doesn't work then try manually going through the instructions below
 (and tell me if you figured out what went wrong so this guide/script can be
 improved)
 
 Guide for setting up ROS with Gazebo
 ================================================================================
 
-ROS stands for Robot Operating System and we will be using it for the URC 2018 competition. ROS will be used in place of the framework that we used last year. There is a lot of documentation about ROS online and a lot of libraries that work nicely with it. 
+ROS stands for Robot Operating System and we will be using it for the URC 2018 competition. ROS will be used in place of the framework that we used last year. There is a lot of documentation about ROS online and a lot of libraries that work nicely with it.
 Gazebo is a robot simulation software that integrates with ROS. We will attempt to use it to simulate the robot.
 
-We'll use ROS version Kinetic Kane. This is the most recent LTS (long term support) build. It is recommended to use Ubuntu and you should be able to use the same Virtual Machine that was set up last year if you have one. Most of this tutorial was taken from various tutorials on the ROS websites below. If anything goes wrong you should try to refer to them. 
+We'll use ROS version Kinetic Kane. This is the most recent LTS (long term support) build. It is recommended to use Ubuntu and you should be able to use the same Virtual Machine that was set up last year if you have one. Most of this tutorial was taken from various tutorials on the ROS websites below. If anything goes wrong you should try to refer to them.
 
 This tutorial assumes you have basic knowledge of a linux terminal. At some point I'll write a tutorial for how to use the linux terminal if people want it.
 
@@ -28,7 +28,7 @@ http://wiki.ros.org/kinetic/Installation
 Link for ROS on Ubuntu:
 http://wiki.ros.org/kinetic/Installation/Ubuntu
 
-The following will be used to denote things you should type into your terminal. This would mean you would literally type "pwd" into your terminal. 
+The following will be used to denote things you should type into your terminal. This would mean you would literally type "pwd" into your terminal.
 $ pwd
 
 Tell Ubuntu about packages hosted on ROS's website

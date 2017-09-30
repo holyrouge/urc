@@ -7,7 +7,7 @@ sudo apt-get install ros-kinetic-desktop-full
 apt-cache search ros-kinetic
 
 sudo rosdep init
-sdep update
+rosdep update
 
 echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc

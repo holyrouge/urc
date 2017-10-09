@@ -9,7 +9,8 @@ apt-cache search ros-kinetic
 sudo rosdep init
 rosdep update
 
-echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+#echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+echo "source devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 sudo apt-get install python-rosinstall
 

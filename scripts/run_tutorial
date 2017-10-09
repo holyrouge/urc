@@ -1,4 +1,5 @@
 #!/bin/bash
-source devel/setup.bash 
+echo "source devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 catkin_make
 roslaunch launch/tutorial.launch 

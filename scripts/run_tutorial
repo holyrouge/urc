@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# echo "source `pwd`/devel/setup.bash" >> ~/.bashrc
-# source ~/.bashrc
-source `pwd`/devel/setup.bash
-
-catkin_make
-roslaunch launch/tutorial.launch 

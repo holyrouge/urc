@@ -50,8 +50,17 @@ find_package(catkin REQUIRED COMPONENTS
 # Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   coord2.msg
+   dummy.msg
    Num2.msg
+   navigation_output.msg
+   processed_gps.msg
+   processed_imu.msg
+   processed_science.msg
+   raw_electrical.msg
+   raw_gps.msg
+   raw_imu.msg
+   raw_imus.msg
+   raw_science.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -205,6 +214,26 @@ add_executable(communication Communication/Communication.cpp)
 target_link_libraries(communication ${catkin_LIBRARIES})
 add_dependencies(communication beginner_tutorials_generate_messages_cpp)
 
-add_executable(gps GPS/gps.cpp)
+add_executable(gps GPS/GPS.cpp)
 target_link_libraries(gps ${catkin_LIBRARIES})
 add_dependencies(gps beginner_tutorials_generate_messages_cpp)
+
+add_executable(imu IMU/IMU.cpp)
+target_link_libraries(imu ${catkin_LIBRARIES})
+add_dependencies(imu beginner_tutorials_generate_messages_cpp)
+
+add_executable(controller Controller/Controller.cpp)
+target_link_libraries(controller ${catkin_LIBRARIES})
+add_dependencies(controller beginner_tutorials_generate_messages_cpp)
+
+add_executable(movement Movement/Movement.cpp)
+target_link_libraries(movement ${catkin_LIBRARIES})
+add_dependencies(movement beginner_tutorials_generate_messages_cpp)
+
+add_executable(navigation Navigation/Navigation.cpp)
+target_link_libraries(navigation ${catkin_LIBRARIES})
+add_dependencies(navigation beginner_tutorials_generate_messages_cpp)
+
+add_executable(science Science/Science.cpp)
+target_link_libraries(science ${catkin_LIBRARIES})
+add_dependencies(science beginner_tutorials_generate_messages_cpp)

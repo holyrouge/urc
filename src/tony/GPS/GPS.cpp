@@ -2,12 +2,14 @@
 #include "std_msgs/String.h"
 #include <std_msgs/Int8.h>
 
-#include "tony/coord2.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/gps_data.h" // see beginner_tutorials/msg/coord.msg
 
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
  */
 
+using namespace tony;
 // Functions for 
 void chatterCallback(const std_msgs::String::ConstPtr& msg)
 {
@@ -20,9 +22,25 @@ void chatterCallback(const std_msgs::String::ConstPtr& msg)
 //   ROS_INFO("Random number: [%d]", msg->data);
 // }
 
-void chatterCallback_struct(const tony::coord2::ConstPtr& msg)
+void chatterCallbackDummy(const dummy::ConstPtr& msg)
 {
-  ROS_INFO("Coord is: [%d, %d]", msg->x, msg->y);
+  ROS_INFO("[x, y] is: [%d, %d]", msg->x, msg->y);
+  ROS_INFO("[Fixed array size is %d]", msg->SIZE);
+
+  for(int i = 0; i < msg->SIZE; i++) {
+    ROS_INFO("fixed[%d] = %d", i, msg->sized_demo[i]);
+  }
+
+  for(int i = 0; i < msg->no_size_demo.size(); i++) {
+    ROS_INFO("non fixed[%d] = %d", i, msg->no_size_demo[i]);
+  }
+}
+
+void gpsCallback(const gps_data::ConstPtr& msg)
+{
+  // *(msg->raw_gps_data);
+  ROS_INFO("GPS array is: [%d]", msg->raw_gps_data[0]);
+  ROS_INFO("GPS array is: [%d]", msg->size_gps_data[0]);
 }
 
 int main(int argc, char **argv)
@@ -66,7 +84,8 @@ int main(int argc, char **argv)
   // 'chatterCallback' is the function that will AUTOMATICALLY called whenever a message occurs
   ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
   // ros::Subscriber sub_int = n.subscribe("chatter_int", 1000, chatterCallback_int);
-  ros::Subscriber sub_struct = n.subscribe("chatter_struct", 1000, chatterCallback_struct);
+  ros::Subscriber dummy_subscriber = n.subscribe("chatter_dummy", 1000, chatterCallbackDummy);
+  ros::Subscriber sub_gps = n.subscribe("gps", 1000, gpsCallback);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all

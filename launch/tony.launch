@@ -1,0 +1,4 @@
+<launch>
+  <node name="communication" pkg="tony" type="communication" output="screen" />
+  <node name="gps" pkg="tony" type="gps" output="screen" />
+</launch>

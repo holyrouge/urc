@@ -10,6 +10,8 @@ sudo rosdep init
 rosdep update
 
 #echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source /opt/ros/kinetic/setup.bash
+catkin_make
 echo "source `pwd`/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 sudo apt-get install python-rosinstall

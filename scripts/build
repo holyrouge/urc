@@ -9,16 +9,17 @@ if [ $SCRIPTPATH == `pwd` ]; then
   cd ..
 fi
 
-`pwd`/devel/setup.bash
+source `pwd`/devel/setup.bash
 
 # Let script run from top level or scripts folder
 if [ -z "$1" ]; then
     catkin_make
 else
-	if [ "$1" == "communication" ]; then
+	lower_case=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+	if [ "$lower_case" == "communication" ]; then
   		catkin_make --pkg tony
   	else
-		catkin_make --pkg $1
+		catkin_make --pkg $lower_case
 	fi
 fi
 

@@ -8,5 +8,5 @@ if [ $SCRIPTPATH == `pwd` ]; then
   cd ..
 fi
 
-`pwd`/devel/setup.bash
+source `pwd`/devel/setup.bash
 catkin_make clean

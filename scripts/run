@@ -15,5 +15,7 @@ if [ $SCRIPTPATH == `pwd` ]; then
   cd ..
 fi
 
-`pwd`/devel/setup.bash
-roslaunch launch/$1.launch
+source `pwd`/devel/setup.bash
+
+lower_case=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+roslaunch launch/$lower_case.launch

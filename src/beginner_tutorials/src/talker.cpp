@@ -55,50 +55,52 @@ void close_joystick()
 	close(joystick_fd);
 }
 
-int get_joystick_status(wwvi_js_event *wjse, controller_state *cst)
+int get_joystick_status(js_event *jse, controller_state *cst)
 {
 	int rc;
-	struct js_event jse;
+	// struct js_event jse;
 	if (joystick_fd < 0)
 		return -1;
 
 	// memset(wjse, 0, sizeof(
-
-	while ((rc = read_joystick_event(&jse) == 1)) {
-		jse.type &= ~JS_EVENT_INIT; // ignore synthetic events
+  // ROS_INFO("Hello");
+	// while ((rc = read_joystick_event(&jse) == 1)) {
+	jse->type &= ~JS_EVENT_INIT; // ignore synthetic events
+  // ROS_INFO("Hello!!");
+  ROS_INFO("type: %d", jse->type);
 
 
 
 /*
-		 if (jse.type == JS_EVENT_AXIS) {
-		 	switch (jse.number) {
-		 	case 0: wjse->stick1_x = jse.value;
-		 		break;
-		 	case 1: wjse->stick1_y = jse.value;
-		 		break;
-		 	case 2: wjse->stick2_x = jse.value;
-		 		break;
-		 	case 3: wjse->stick2_y = jse.value;
- 		break;
-		 	default:
-		 		break;
-		 	}
-		} else*/ if (jse.type == 1) {
-		 	//main buttons
+	 if (jse.type == JS_EVENT_AXIS) {
+	 	switch (jse.number) {
+	 	case 0: wjse->stick1_x = jse.value;
+	 		break;
+	 	case 1: wjse->stick1_y = jse.value;
+	 		break;
+	 	case 2: wjse->stick2_x = jse.value;
+	 		break;
+	 	case 3: wjse->stick2_y = jse.value;
+		break;
+	 	default:
+	 		break;
+	 	}
+	} else*/ if (jse->type == 1) {
+	 	//main buttons
 
-        switch(jse.number){
-          case 0 :/*ROS_INFO("A pressed");*/ cst->isPressed[0] = !cst->isPressed[0]; break;
-          case 1 : /*ROS_INFO("B pressed");*/ break;
-          case 2 :/*ROS_INFO("X pressed");*/ break;
-          case 3 : /*ROS_INFO("Y pressed");*/break;
-          default : /*ROS_INFO(" pressed");*/ break;
-        }
+      switch(jse->number){
+        case 0 :ROS_INFO("A pressed"); cst->isPressed[0] = !cst->isPressed[0]; break;
+        case 1 : /*ROS_INFO("B pressed");*/ break;
+        case 2 :/*ROS_INFO("X pressed");*/ break;
+        case 3 : /*ROS_INFO("Y pressed");*/break;
+        default : /*ROS_INFO(" pressed");*/ break;
+      }
 
 
 
-				}
+			}
 
-		 }
+		 // } // Weird while loop
 		 //ROS_INFO("Pressed?: %d\n", cst->isPressed[0]);
 	// printf("%d\n", wjse->stick1_y);
 	return 0;
@@ -119,7 +121,7 @@ int fd, rc;
 int done = 0;
 
 struct js_event jse;
-struct wwvi_js_event wjse;
+// struct wwvi_js_event wjse;
 struct controller_state cst;
 
 for(int i=0; i<11;i++){
@@ -136,13 +138,15 @@ if (fd < 0) {
 
 while (!done) {
   rc = read_joystick_event(&jse);
+  
   usleep(1000);
   if (rc == 1) {
-    get_joystick_status(&wjse,&cst);
+    // ROS_INFO("...: %d", jse->type);
+    get_joystick_status(&jse,&cst);
 
 
-    ROS_INFO("Event: time %8u, value %8hd, type: %3u, axis/button: %u\n",
-      jse.time, jse.value, jse.type, jse.number);
+    // ROS_INFO("Event: time %8u, value %8hd, type: %3u, axis/button: %u\n",
+      // jse.time, jse.value, jse.type, jse.number);
 			//if(jse.type == 1)
 			//ROS_INFO("Controller state: A %d\n", cst.isPressed[0]);
 

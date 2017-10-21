@@ -39,13 +39,13 @@ struct js_event {
 	unsigned char number;   /* axis/button number */
 };
 
-struct wwvi_js_event {
+/*struct wwvi_js_event {
 	int button[11];
 	int stick1_x;
 	int stick1_y;
 	int stick2_x;
 	int stick2_y;
-};
+};*/
 
 struct controller_state{
 	bool isPressed[11];

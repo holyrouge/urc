@@ -10,4 +10,12 @@ if [ $SCRIPTPATH == `pwd` ]; then
 fi
 
 `pwd`/devel/setup.bash
-catkin_make
+
+# Let script run from top level or scripts folder
+if [ -z "$1" ]; then
+    catkin_make
+else
+	catkin_make --pkg $1
+fi
+
+

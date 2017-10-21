@@ -3,7 +3,7 @@
 #include <std_msgs/Int8.h>
 
 #include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
-#include "tony/gps_data.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
 
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
@@ -36,7 +36,7 @@ void chatterCallbackDummy(const dummy::ConstPtr& msg)
   }
 }
 
-void gpsCallback(const gps_data::ConstPtr& msg)
+void gpsCallback(const raw_gps::ConstPtr& msg)
 {
   // *(msg->raw_gps_data);
   ROS_INFO("GPS array is: [%d]", msg->raw_gps_data[0]);

@@ -212,28 +212,28 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(communication Communication/Communication.cpp)
 target_link_libraries(communication ${catkin_LIBRARIES})
-add_dependencies(communication beginner_tutorials_generate_messages_cpp)
+add_dependencies(communication tony_generate_messages_cpp)
 
 add_executable(gps GPS/GPS.cpp)
 target_link_libraries(gps ${catkin_LIBRARIES})
-add_dependencies(gps beginner_tutorials_generate_messages_cpp)
+add_dependencies(gps tony_generate_messages_cpp)
 
 add_executable(imu IMU/IMU.cpp)
 target_link_libraries(imu ${catkin_LIBRARIES})
-add_dependencies(imu beginner_tutorials_generate_messages_cpp)
+add_dependencies(imu tony_generate_messages_cpp)
 
 add_executable(controller Controller/Controller.cpp)
 target_link_libraries(controller ${catkin_LIBRARIES})
-add_dependencies(controller beginner_tutorials_generate_messages_cpp)
+add_dependencies(controller tony_generate_messages_cpp)
 
 add_executable(movement Movement/Movement.cpp)
 target_link_libraries(movement ${catkin_LIBRARIES})
-add_dependencies(movement beginner_tutorials_generate_messages_cpp)
+add_dependencies(movement tony_generate_messages_cpp)
 
 add_executable(navigation Navigation/Navigation.cpp)
 target_link_libraries(navigation ${catkin_LIBRARIES})
-add_dependencies(navigation beginner_tutorials_generate_messages_cpp)
+add_dependencies(navigation tony_generate_messages_cpp)
 
 add_executable(science Science/Science.cpp)
 target_link_libraries(science ${catkin_LIBRARIES})
-add_dependencies(science beginner_tutorials_generate_messages_cpp)
+add_dependencies(science tony_generate_messages_cpp)

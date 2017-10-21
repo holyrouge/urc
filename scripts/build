@@ -15,7 +15,11 @@ fi
 if [ -z "$1" ]; then
     catkin_make
 else
-	catkin_make --pkg $1
+	if [ "$1" == "communication" ]; then
+  		catkin_make --pkg tony
+  	else
+		catkin_make --pkg $1
+	fi
 fi
 
 

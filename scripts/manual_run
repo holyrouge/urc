@@ -1,0 +1,31 @@
+#!/bin/bash
+# Runs n different nodes at once: 
+# ./scripts/manual_run communication controller
+
+# Let script run from top level or scripts folder
+if [ -z "$1" ]
+  then
+    echo "ERROR: No argument supplied. Did you mean to have tony as an arg?"
+    exit
+fi
+
+SCRIPT=`realpath $0`
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
+
+if [ $SCRIPTPATH == `pwd` ]; then
+  cd ..
+fi
+
+source `pwd`/devel/setup.bash
+
+launch_file="./launch/dummy.launch"
+
+echo "<launch>" > $launch_file
+
+for arg in "$@"; do
+lower_case=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" />" >> $launch_file
+done
+echo "</launch>" >> $launch_file
+roslaunch $launch_file

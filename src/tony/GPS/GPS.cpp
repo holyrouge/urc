@@ -4,6 +4,7 @@
 
 #include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
 #include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
+#include "./GPS.h"
 
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.

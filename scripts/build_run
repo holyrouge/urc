@@ -27,7 +27,7 @@ fi
 
 source `pwd`/devel/setup.bash
 
-if ./scripts/build tony; then
+if ./scripts/manual_build tony; then
 	echo "Build suceeded"
 	./scripts/manual_run $@
 else

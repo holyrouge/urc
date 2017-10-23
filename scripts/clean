@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "help" ]; then	
+	echo "Cleans all packages."
+	echo "Usage: ./scripts/clean | Cleans everything"
+    exit
+fi
+
 # Let script run from top level or scripts folder
 SCRIPT=`realpath $0`
 SCRIPTPATH=`dirname $SCRIPT`

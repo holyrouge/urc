@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [ "$1" == "help" ]; then	
+	echo "Launches the specified launch file"
+	echo "Usage: ./scripts/manual_launch tony               | runs tony"
+    echo "     : ./scripts/manual_launch beginner_tutorials | runs beginner_tutorials"
+    echo "     : ./scripts/manual_launch [launch_file]      | runs launch_file"
+    exit
+fi
+
 # Let script run from top level or scripts folder
 if [ -z "$1" ]
   then

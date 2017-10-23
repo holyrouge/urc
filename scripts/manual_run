@@ -1,7 +1,10 @@
 #!/bin/bash
-# Runs n different nodes at once: 
-# ./scripts/manual_run communication controller
-
+if [ "$1" == "help" ]; then	
+	echo "Runs various packages."
+	echo "Usage: ./scripts/manual_run tony                      | Runs tony"
+    echo "     : ./scripts/manual_run [package1, package2 ...]  | Runs all specified packages"
+    exit
+fi
 # Let script run from top level or scripts folder
 if [ -z "$1" ]
   then
@@ -19,13 +22,19 @@ fi
 
 source `pwd`/devel/setup.bash
 
+lower_case=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+if [ "$lower_case" == "tony" ]; then
+	roslaunch ./launch/tony.launch
+	exit
+fi
+
 launch_file="./launch/dummy.launch"
 
 echo "<launch>" > $launch_file
 
 for arg in "$@"; do
-lower_case=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
-echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" />" >> $launch_file
+	lower_case=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+	echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" />" >> $launch_file
 done
 echo "</launch>" >> $launch_file
 roslaunch $launch_file

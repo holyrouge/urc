@@ -10,8 +10,8 @@ EASIEST WAY
 
 From the top level folder (urc2018)
 
-$ ./scripts/build beginner_tutorial
-$ ./scripts/run beginner_tutorial
+$ ./scripts/manual_build beginner_tutorial
+$ ./scripts/manual_run beginner_tutorial
 
 CTRL-C to kill 
 

@@ -237,3 +237,7 @@ add_dependencies(navigation tony_generate_messages_cpp)
 add_executable(science Science/Science.cpp)
 target_link_libraries(science ${catkin_LIBRARIES})
 add_dependencies(science tony_generate_messages_cpp)
+
+add_executable(sample Sample/Sample.cpp)
+target_link_libraries(sample ${catkin_LIBRARIES})
+add_dependencies(sample tony_generate_messages_cpp)

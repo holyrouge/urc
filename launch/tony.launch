@@ -1,0 +1,9 @@
+<launch>
+  <node name="communication" pkg="tony" type="communication" output="screen" />
+  <node name="gps" pkg="tony" type="gps" output="screen" />
+  <node name="imu" pkg="tony" type="imu" output="screen" />
+  <node name="controller" pkg="tony" type="controller" output="screen" />
+  <node name="movement" pkg="tony" type="movement" output="screen" />
+  <node name="navigation" pkg="tony" type="navigation" output="screen" />
+  <node name="science" pkg="tony" type="science" output="screen" />
+</launch>

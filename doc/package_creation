@@ -34,3 +34,7 @@ add_dependencies(talker beginner_tutorials_generate_messages_cpp)
 add_executable(listener src/listener.cpp)
 target_link_libraries(listener ${catkin_LIBRARIES})
 add_dependencies(listener beginner_tutorials_generate_messages_cpp)
+
+
+devel/.catkin is where catkin will try to build
+/home/jwcullen/Documents/urc2018/src;more_dirs:more_dirs2

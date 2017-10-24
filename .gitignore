@@ -1,3 +1,5 @@
 build/
 devel/
+launch/dummy.launch
+src/test_gazebo
 *~

@@ -1,6 +1,13 @@
 #include "ros/ros.h"
-#include <stdlib.h>
 #include <sstream>
+#include "joystick.h"
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 /**
@@ -10,15 +17,143 @@
  */
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
-#include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
-#include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
+
+static int joystick_fd = -1;
+
+int open_joystick()
+{
+  joystick_fd = open(JOYSTICK_DEVNAME, O_RDONLY | O_NONBLOCK); /* read write for force feedback? */
+  if (joystick_fd < 0)
+    return joystick_fd;
+
+  /* maybe ioctls to interrogate features here? */
+
+  return joystick_fd;
+}
+
+int read_joystick_event(struct js_event *jse)
+{
+  int bytes;
+
+  bytes = read(joystick_fd, jse, sizeof(*jse));
+
+  if (bytes == -1)
+    return 0;
+
+  if (bytes == sizeof(*jse))
+    return 1;
+
+
+  ROS_INFO("Unexpected bytes from joystick:%d\n", bytes);
+
+  return -1;
+}
+
+void close_joystick()
+{
+  close(joystick_fd);
+}
+
+int get_joystick_status(js_event *jse, controller_state *cst)
+{
+  int rc;
+  // struct js_event jse;
+  if (joystick_fd < 0)
+    return -1;
+
+  // memset(wjse, 0, sizeof(
+  // ROS_INFO("Hello");
+  // while ((rc = read_joystick_event(&jse) == 1)) {
+  jse->type &= ~JS_EVENT_INIT; // ignore synthetic events
+  // ROS_INFO("Hello!!");
+  ROS_INFO("type: %d", jse->type);
+
+
+
+/*
+   if (jse.type == JS_EVENT_AXIS) {
+    switch (jse.number) {
+    case 0: wjse->stick1_x = jse.value;
+      break;
+    case 1: wjse->stick1_y = jse.value;
+      break;
+    case 2: wjse->stick2_x = jse.value;
+      break;
+    case 3: wjse->stick2_y = jse.value;
+    break;
+    default:
+      break;
+    }
+  } else*/ if (jse->type == 1) {
+    //main buttons
+
+      switch(jse->number){
+        case 0 :ROS_INFO("A pressed"); cst->isPressed[0] = !cst->isPressed[0]; break;
+        case 1 : /*ROS_INFO("B pressed");*/ break;
+        case 2 :/*ROS_INFO("X pressed");*/ break;
+        case 3 : /*ROS_INFO("Y pressed");*/break;
+        default : /*ROS_INFO(" pressed");*/ break;
+      }
+
+
+
+      }
+
+     // } // Weird while loop
+     //ROS_INFO("Pressed?: %d\n", cst->isPressed[0]);
+  // printf("%d\n", wjse->stick1_y);
+  return 0;
+}
+
+
+
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
-using namespace tony;
 int main(int argc, char **argv)
 {
+
+//Joystick stuff
+
+int fd, rc;
+int done = 0;
+
+struct js_event jse;
+// struct wwvi_js_event wjse;
+struct controller_state cst;
+
+for(int i=0; i<11;i++){
+  cst.isPressed[i] =false;
+}
+
+fd = open_joystick();
+
+
+if (fd < 0) {
+  ROS_INFO("Controller failed to open.\n");
+  exit(1);
+}
+
+while (!done) {
+  rc = read_joystick_event(&jse);
+  
+  usleep(1000);
+  if (rc == 1) {
+    // ROS_INFO("...: %d", jse->type);
+    get_joystick_status(&jse,&cst);
+
+
+    // ROS_INFO("Event: time %8u, value %8hd, type: %3u, axis/button: %u\n",
+      // jse.time, jse.value, jse.type, jse.number);
+      //if(jse.type == 1)
+      //ROS_INFO("Controller state: A %d\n", cst.isPressed[0]);
+
+    }
+  }
+
+
+
   /**
    * The ros::init() function needs to see argc and argv so that it can perform
    * any ROS arguments and name remapping that were provided at the command line.
@@ -46,7 +181,9 @@ int main(int argc, char **argv)
    * node will notify anyone who is trying to subscribe to this topic name,
    * and they will in turn negotiate a peer-to-peer connection with this
    * node.  advertise() returns a Publisher object which allows you to
-   * publish messages on that topic through a call to publish().  Once
+   * publish messages on#include <stdio.h>
+
+ that topic through a call to publish().  Once
    * all copies of the returned Publisher object are destroyed, the topic
    * will be automatically unadvertised.
    *
@@ -56,12 +193,11 @@ int main(int argc, char **argv)
    * buffer up before throwing some away.
    */
 
-  // "chatter" is the name of the 'channel' of communication. The listener will 
+  // "chatter" is the name of the 'channel' of communication. The listener will
   // be looking for one called "chatter" for the string type for example
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+  // ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
   // ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
-  ros::Publisher dummy_pub = n.advertise<dummy>("chatter_dummy", 1000);
-  ros::Publisher gps_channel = n.advertise<raw_gps>("gps", 1000);
+  // ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
 
   ros::Rate loop_rate(10);
 
@@ -72,53 +208,12 @@ int main(int argc, char **argv)
   int count = 0;
   while (ros::ok())
   {
-    /**
-     * This is a message object. You stuff it with data, and then publish it.
-     */
-    std_msgs::String msg; 
 
-    std::stringstream ss;
-    ss << "hello world " << count;
-    msg.data = ss.str();
-
-    ROS_INFO("%s", msg.data.c_str());
-
-
-    /**
-     * The publish() function is how you send messages. The parameter
-     * is the message object. The type of this object must agree with the type
-     * given as a template parameter to the advertise<>() call, as was done
-     * in the constructor above.
-     */
-    chatter_pub.publish(msg);
-
-    // // Do the same except generate a random int
-    // std_msgs::Int8 msg_int;
-    // msg_int.data = std::rand() % 100;
-    // chatter_pub_int.publish(msg_int);
-
-    // Do the same except send a set of data with arbitrary types (this must be predefined in a .msg file)
-    dummy sample;
-    sample.x=50; 
-    sample.y=100;
-    sample.sized_demo[0] = 53;
-    sample.sized_demo[1] = 1312;
-    sample.sized_demo[2] = 134;
-    sample.no_size_demo.push_back(321);
-    sample.no_size_demo.push_back(32);
-    sample.no_size_demo.push_back(7899);
-    dummy_pub.publish(sample);
-
-    raw_gps gps;
-    gps.raw_gps_data.push_back(0);
-    gps.raw_gps_data.push_back(50);
-    gps.size_gps_data[0];
-    // gps.size_gps_data.push_back(50);
-
-    gps_channel.publish(gps);
+    //ROS_INFO("%s", msg.data.c_str());
 
     // Call this at end of "doing stuff"
     ros::spinOnce();
+
     loop_rate.sleep();
     ++count;
   }

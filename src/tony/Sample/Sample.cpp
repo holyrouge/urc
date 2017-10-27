@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <sstream>
 
-
 /**
  * Make sure to include the standard types for any messages you send and any
  * custom types that you define in .msg files (the .h files should be auto

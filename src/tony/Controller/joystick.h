@@ -47,24 +47,24 @@ struct js_event {
 	int stick2_y;
 };*/
 
-struct controller_state{
-	bool isPressed[11];
-	int stickL_x;
-	int stickL_y;
-	int stickR_x;
-	int stickR_y;
-	int dpad_x;
-	int dpad_y;
-	int lt;
-	int rt;
-	int type;
-} test = {false,1};
+// struct controller_state{
+// 	bool isPressed[11];
+// 	int stickL_x;
+// 	int stickL_y;
+// 	int stickR_x;
+// 	int stickR_y;
+// 	int dpad_x;
+// 	int dpad_y;
+// 	int lt;
+// 	int rt;
+// 	int type;
+// } test = {false,1};
 
 extern int open_joystick(char *joystick_device);
 extern int read_joystick_event(struct js_event *jse);
 extern void set_joystick_y_axis(int axis);
 extern void set_joystick_x_axis(int axis);
 extern void close_joystick();
-extern int get_joystick_status(struct wwvi_js_event *wjse);
+// extern int get_joystick_status(struct wwvi_js_event *wjse);
 
 #endif

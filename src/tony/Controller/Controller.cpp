@@ -17,6 +17,9 @@
  */
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
+#include "tony/controller.h"
+
+using namespace tony;
 
 static int joystick_fd = -1;
 
@@ -54,7 +57,7 @@ void close_joystick()
   close(joystick_fd);
 }
 
-int get_joystick_status(js_event *jse, controller_state *cst)
+int get_joystick_status(js_event *jse, controller *cst)
 {
   int rc;
   // struct js_event jse;
@@ -133,6 +136,12 @@ int get_joystick_status(js_event *jse, controller_state *cst)
 int main(int argc, char **argv)
 {
 
+ros::init(argc, argv, "talker");
+ros::NodeHandle n;
+
+ros::Publisher controller_pub = n.advertise<controller>("controller_data", 1000);
+
+controller state;
 //Joystick stuff
 
 int fd, rc;
@@ -140,11 +149,22 @@ int done = 0;
 
 struct js_event jse;
 // struct wwvi_js_event wjse;
-struct controller_state cst;
+// struct controller_state cst;
 
 for(int i=0; i<11;i++){
-  cst.isPressed[i] =false;
+  // cst.isPressed[i] =false;
+  state.isPressed[i]=false;
 }
+
+state.stickL_x=0;
+state.stickL_y=0;
+state.stickR_x=0;
+state.stickR_y=0;
+state.dpad_x=0;
+state.dpad_y=0;
+state.lt=0;
+state.rt=0;
+state.type=0;
 
 fd = open_joystick();
 
@@ -189,32 +209,32 @@ while (!done) {
     			else
     				ROS_INFO("RIGHT Bumper is NOT Pressed");*/
     	case START : 
-    		if(cst.isPressed[START]==1)
+    		if(state.isPressed[START]==1)
     			ROS_INFO("START is Pressed");
     			else
     				ROS_INFO("START is NOT Pressed");
-    	ROS_INFO("A state: %u", !cst.isPressed[A]);
-    	ROS_INFO("B state: %u", !cst.isPressed[B]);
-    	ROS_INFO("X state: %u", !cst.isPressed[X]);
-    	ROS_INFO("Y state: %u", !cst.isPressed[Y]);
-    	ROS_INFO("LB state: %u", !cst.isPressed[LB]);
-    	ROS_INFO("RB state: %u\n", !cst.isPressed[RB]);
-    	ROS_INFO("SELECT state: %u", !cst.isPressed[SELECT]);
-    	ROS_INFO("L3 state: %u", !cst.isPressed[L3]);
-    	ROS_INFO("R3 state: %u", !cst.isPressed[R3]);
+    	ROS_INFO("A state: %u", !state.isPressed[A]);
+    	ROS_INFO("B state: %u", !state.isPressed[B]);
+    	ROS_INFO("X state: %u", !state.isPressed[X]);
+    	ROS_INFO("Y state: %u", !state.isPressed[Y]);
+    	ROS_INFO("LB state: %u", !state.isPressed[LB]);
+    	ROS_INFO("RB state: %u\n", !state.isPressed[RB]);
+    	ROS_INFO("SELECT state: %u", !state.isPressed[SELECT]);
+    	ROS_INFO("L3 state: %u", !state.isPressed[L3]);
+    	ROS_INFO("R3 state: %u", !state.isPressed[R3]);
 
     	break;
         default : /*ROS_INFO(" pressed");*/ break;
       }
   }else if (jse.type == 2){
   	switch(jse.number){
-      	case RS_X : ROS_INFO("Right JS X: %8hd",  cst.stickR_x);
+      	case RS_X : ROS_INFO("Right JS X: %8hd",  state.stickR_x);
       	break;
-      	case RS_Y : ROS_INFO("Right JS Y: %8hd", cst.stickR_y);
+      	case RS_Y : ROS_INFO("Right JS Y: %8hd", state.stickR_y);
       	break;
-      	case LS_X : ROS_INFO("Left JS X: %8hd",  cst.stickL_x);
+      	case LS_X : ROS_INFO("Left JS X: %8hd",  state.stickL_x);
       	break;
-      	case LS_Y : ROS_INFO("Left JS Y: %8hd",  cst.stickL_y);
+      	case LS_Y : ROS_INFO("Left JS Y: %8hd",  state.stickL_y);
       	break; 
       	default : break;
       }
@@ -222,7 +242,7 @@ while (!done) {
 
   }
     
-    get_joystick_status(&jse,&cst);
+    get_joystick_status(&jse,&state);
 
 
 
@@ -236,24 +256,7 @@ while (!done) {
 
 
 
-  /**
-   * The ros::init() function needs to see argc and argv so that it can perform
-   * any ROS arguments and name remapping that were provided at the command line.
-   * For programmatic remappings you can use a different version of init() which takes
-   * remappings directly, but for most command-line programs, passing argc and argv is
-   * the easiest way to do it.  The third argument to init() is the name of the node.
-   *
-   * You must call one of the versions of ros::init() before using any other
-   * part of the ROS system.
-   */
-  ros::init(argc, argv, "talker");
 
-  /**
-   * NodeHandle is the main access point to communications with the ROS system.
-   * The first NodeHandle constructed will fully initialize this node, and the last
-   * NodeHandle destructed will close down the node.
-   */
-  ros::NodeHandle n;
 
   /**
    * The advertise() function is how you tell ROS that you want to

@@ -3,10 +3,10 @@
 #ifndef __JOYSTICK_H__
 #define __JOYSTICK_H__
 //TYPE 1
-#define A_BUTTON 0
-#define B_BUTTON 1
-#define X_BUTTON 2
-#define Y_BUTTON 3
+#define A 0
+#define B 1
+#define X 2
+#define Y 3
 #define RB 5
 #define LB 4
 #define BACK 6

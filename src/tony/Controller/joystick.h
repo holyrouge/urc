@@ -9,11 +9,11 @@
 #define Y 3
 #define RB 5
 #define LB 4
-#define BACK 6
+#define SELECT 6
 #define START 7
 #define XBOX 8
-#define LEFT_STICK_BUTTON 9
-#define RIGHT_STICK_BUTTON 10
+#define L3 9 // left stick button
+#define R3 10 // left stick button
 
 //TYPE 2
 #define LS_X 0
@@ -49,7 +49,14 @@ struct js_event {
 
 struct controller_state{
 	bool isPressed[11];
-
+	int stickL_x;
+	int stickL_y;
+	int stickR_x;
+	int stickR_y;
+	int dpad_x;
+	int dpad_y;
+	int lt;
+	int rt;
 	int type;
 } test = {false,1};
 

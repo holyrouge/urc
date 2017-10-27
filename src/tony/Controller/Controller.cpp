@@ -88,18 +88,33 @@ int get_joystick_status(js_event *jse, controller_state *cst)
     //main buttons
 
       switch(jse->number){
-        case A : cst->isPressed[0] = !cst->isPressed[0];  break;//A
-        case B : cst->isPressed[1] = !cst->isPressed[1]; break;//B
-        case X : cst->isPressed[2] = !cst->isPressed[2]; break;//X
-        case Y : cst->isPressed[3] = !cst->isPressed[3]; break;//Y
-        case LB : cst->isPressed[4] = !cst->isPressed[4]; break;//LEFT bumper
-        case RB : cst->isPressed[5] = !cst->isPressed[5]; break;//RIGHT bumper
+        case A : cst->isPressed[A] = !cst->isPressed[A];  break;//A
+        case B : cst->isPressed[B] = !cst->isPressed[B]; break;//B
+        case X : cst->isPressed[X] = !cst->isPressed[X]; break;//X
+        case Y : cst->isPressed[Y] = !cst->isPressed[Y]; break;//Y
+        case LB : cst->isPressed[LB] = !cst->isPressed[LB]; break;//LEFT bumper
+        case RB : cst->isPressed[RB] = !cst->isPressed[RB]; break;//RIGHT bumper
         case START : cst->isPressed[START] = !cst->isPressed[START]; break;
+        case L3 : cst->isPressed[L3] = !cst->isPressed[L3]; break;
+        case R3 : cst->isPressed[R3] = !cst->isPressed[R3]; break;
+        case SELECT : cst->isPressed[SELECT] = !cst->isPressed[SELECT]; break;
+        case XBOX : cst->isPressed[XBOX] = !cst->isPressed[XBOX]; break;
+
         default : /*ROS_INFO("??? pressed");*/ break;
       	}
       }else {
-      	
 
+      switch(jse->number){
+      	case LS_X : cst->stickL_x = jse->value; break;
+      	case LS_Y : cst->stickL_y = jse->value; break;
+      	case RS_X : cst->stickR_x = jse->value; break;
+      	case RS_Y : cst->stickR_y = jse->value; break;
+      	case LT : cst->lt = jse->value; break;
+      	case RT : cst->rt = jse->value; break;
+      	case DPAD_X : cst->dpad_x = jse->value; break;
+      	case DPAD_Y : cst->dpad_y = jse->value; break;
+      	default : break;
+      	}
 
       }
 
@@ -149,7 +164,7 @@ while (!done) {
   	ROS_INFO("type: %d", jse.type);
   	if(jse.type == 1){
     switch(jse.number){
-        case A :if(cst.isPressed[0]==1)
+       /* case A :if(cst.isPressed[0]==1)
     			ROS_INFO("A is Pressed");
     			else
     				ROS_INFO("A is NOT Pressed");   break;
@@ -157,11 +172,11 @@ while (!done) {
     			ROS_INFO("B is Pressed");
     			else
     				ROS_INFO("B is NOT Pressed");break;
-        case X :/*ROS_INFO("X pressed");*/if(cst.isPressed[2]==1)
+        case X :if(cst.isPressed[2]==1)
     			ROS_INFO("X is Pressed");
     			else
     				ROS_INFO("X is NOT Pressed");  break;
-        case Y : /*ROS_INFO("Y pressed");*/if(cst.isPressed[3]==1)
+        case Y : if(cst.isPressed[3]==1)
     			ROS_INFO("Y is Pressed");
     			else
     				ROS_INFO("Y is NOT Pressed"); break;
@@ -172,30 +187,34 @@ while (!done) {
     	case RB :  if(cst.isPressed[5]==1)
     			ROS_INFO("RIGHT Bumper is Pressed");
     			else
-    				ROS_INFO("RIGHT Bumper is NOT Pressed");
+    				ROS_INFO("RIGHT Bumper is NOT Pressed");*/
     	case START : 
     		if(cst.isPressed[START]==1)
     			ROS_INFO("START is Pressed");
     			else
     				ROS_INFO("START is NOT Pressed");
-    	ROS_INFO("A state: %u", !cst.isPressed[0]);
-    	ROS_INFO("B state: %u", !cst.isPressed[1]);
-    	ROS_INFO("X state: %u", !cst.isPressed[2]);
-    	ROS_INFO("Y state: %u", !cst.isPressed[3]);
-    	ROS_INFO("LB state: %u", !cst.isPressed[4]);
-    	ROS_INFO("RB state: %u\n", !cst.isPressed[5]);
+    	ROS_INFO("A state: %u", !cst.isPressed[A]);
+    	ROS_INFO("B state: %u", !cst.isPressed[B]);
+    	ROS_INFO("X state: %u", !cst.isPressed[X]);
+    	ROS_INFO("Y state: %u", !cst.isPressed[Y]);
+    	ROS_INFO("LB state: %u", !cst.isPressed[LB]);
+    	ROS_INFO("RB state: %u\n", !cst.isPressed[RB]);
+    	ROS_INFO("SELECT state: %u", !cst.isPressed[SELECT]);
+    	ROS_INFO("L3 state: %u", !cst.isPressed[L3]);
+    	ROS_INFO("R3 state: %u", !cst.isPressed[R3]);
+
     	break;
         default : /*ROS_INFO(" pressed");*/ break;
       }
   }else if (jse.type == 2){
   	switch(jse.number){
-      	case RS_X : ROS_INFO("Right JS X: %8hd",  jse.value);
+      	case RS_X : ROS_INFO("Right JS X: %8hd",  cst.stickR_x);
       	break;
-      	case RS_Y : ROS_INFO("Right JS Y: %8hd", jse.value);
+      	case RS_Y : ROS_INFO("Right JS Y: %8hd", cst.stickR_y);
       	break;
-      	case LS_X : ROS_INFO("Left JS X: %8hd",  jse.value);
+      	case LS_X : ROS_INFO("Left JS X: %8hd",  cst.stickL_x);
       	break;
-      	case LS_Y : ROS_INFO("Left JS Y: %8hd",  jse.value);
+      	case LS_Y : ROS_INFO("Left JS Y: %8hd",  cst.stickL_y);
       	break; 
       	default : break;
       }

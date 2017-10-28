@@ -1,0 +1,24 @@
+run
+runs code in real time
+
+start
+Runs code and sets breakpoint at main
+
+where
+See what line we are on
+
+^C
+breaks code where we are
+
+git clone git://github.com/cgdb/cgdb.git
+cd cgdb
+sudo apt-get install automake
+./autogen.sh
+sudo apt-get install libncurses5-dev libncursesw5-dev
+sudo apt-get install flex
+sudo apt-get install texinfo
+sudo apt-get install libreadline6 libreadline6-dev
+./configure --prefix=/usr/local
+make
+sudo make install
+sudo apt install cgdb

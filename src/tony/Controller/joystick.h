@@ -3,27 +3,27 @@
 #ifndef __JOYSTICK_H__
 #define __JOYSTICK_H__
 //TYPE 1
-#define A 0
-#define B 1
-#define X 2
-#define Y 3
-#define RB 5
-#define LB 4
-#define SELECT 6
-#define START 7
-#define XBOX 8
-#define L3 9 // left stick button
-#define R3 10 // left stick button
+// #define A 0
+// #define B 1
+// #define X 2
+// #define Y 3
+// #define RB 5
+// #define LB 4
+// #define SELECT 6
+// #define START 7
+// #define XBOX 8
+// #define L3 9 // left stick button
+// #define R3 10 // left stick button
 
-//TYPE 2
-#define LS_X 0
-#define LS_Y 1
-#define RS_X 2
-#define RS_Y 3
-#define RT 4
-#define LT 5
-#define DPAD_X 6
-#define DPAD_Y 7
+// //TYPE 2
+// #define LS_X 0
+// #define LS_Y 1
+// #define RS_X 2
+// #define RS_Y 3
+// #define RT 4
+// #define LT 5
+// #define DPAD_X 6
+// #define DPAD_Y 7
 
 #define JOYSTICK_DEVNAME "/dev/input/js0"
 

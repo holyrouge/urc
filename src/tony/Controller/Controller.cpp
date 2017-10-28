@@ -23,6 +23,27 @@ using namespace tony;
 
 static int joystick_fd = -1;
 
+
+const int A = 0;
+const int B = 1;
+const int X = 2;
+const int Y = 3;
+const int RB = 5;
+const int LB = 4;
+const int SELECT = 6;
+const int START = 7;
+const int XBOX = 8;
+const int L3 = 9; // left stick button
+const int R3 = 10; // left stick button
+const int LS_X = 0;
+const int LS_Y = 1;
+const int RS_X = 2;
+const int RS_Y = 3;
+const int RT = 4;
+const int LT = 5;
+const int DPAD_X = 6;
+const int DPAD_Y = 7;
+
 int open_joystick()
 {
   joystick_fd = open(JOYSTICK_DEVNAME, O_RDONLY | O_NONBLOCK); /* read write for force feedback? */
@@ -166,6 +187,31 @@ state.lt=0;
 state.rt=0;
 state.type=0;
 
+// A = state.A;
+// B = state.B;
+// X = state.X;
+// Y = state.Y;
+// RB = state.RB;
+// LB = state.LB;
+// SELECT = state.SELECT;
+// START = state.START;
+// XBOX = state.XBOX;
+// R3 = state.R3;
+
+// LS_X = state.LS_X;
+// LS_Y = state.LS_Y;
+// RS_X = state.RS_X;
+// RS_Y = state.RS_Y;
+// RT = state.RT;
+// LT = state.LT;
+// DPAD_X = state.DPAD_X;
+// DPAD_Y = state.DPAD_Y;
+
+
+state.NUM_BUTTONS;
+
+controller_pub.publish(state);
+
 fd = open_joystick();
 
 
@@ -174,85 +220,7 @@ if (fd < 0) {
   exit(1);
 }
 
-while (!done) {
-  rc = read_joystick_event(&jse);
-  
-  usleep(1000);
-  if (rc == 1) {
-    // ROS_INFO("...: %d", jse->type);
 
-  	ROS_INFO("type: %d", jse.type);
-  	if(jse.type == 1){
-    switch(jse.number){
-       /* case A :if(cst.isPressed[0]==1)
-    			ROS_INFO("A is Pressed");
-    			else
-    				ROS_INFO("A is NOT Pressed");   break;
-        case B :  if(cst.isPressed[1]==1)
-    			ROS_INFO("B is Pressed");
-    			else
-    				ROS_INFO("B is NOT Pressed");break;
-        case X :if(cst.isPressed[2]==1)
-    			ROS_INFO("X is Pressed");
-    			else
-    				ROS_INFO("X is NOT Pressed");  break;
-        case Y : if(cst.isPressed[3]==1)
-    			ROS_INFO("Y is Pressed");
-    			else
-    				ROS_INFO("Y is NOT Pressed"); break;
-    	case LB :  if(cst.isPressed[4]==1)
-    			ROS_INFO("LEFT Bumper is Pressed");
-    			else
-    				ROS_INFO("LEFT Bumper is NOT Pressed");break;
-    	case RB :  if(cst.isPressed[5]==1)
-    			ROS_INFO("RIGHT Bumper is Pressed");
-    			else
-    				ROS_INFO("RIGHT Bumper is NOT Pressed");*/
-    	case START : 
-    		if(state.isPressed[START]==1)
-    			ROS_INFO("START is Pressed");
-    			else
-    				ROS_INFO("START is NOT Pressed");
-    	ROS_INFO("A state: %u", !state.isPressed[A]);
-    	ROS_INFO("B state: %u", !state.isPressed[B]);
-    	ROS_INFO("X state: %u", !state.isPressed[X]);
-    	ROS_INFO("Y state: %u", !state.isPressed[Y]);
-    	ROS_INFO("LB state: %u", !state.isPressed[LB]);
-    	ROS_INFO("RB state: %u\n", !state.isPressed[RB]);
-    	ROS_INFO("SELECT state: %u", !state.isPressed[SELECT]);
-    	ROS_INFO("L3 state: %u", !state.isPressed[L3]);
-    	ROS_INFO("R3 state: %u", !state.isPressed[R3]);
-
-    	break;
-        default : /*ROS_INFO(" pressed");*/ break;
-      }
-  }else if (jse.type == 2){
-  	switch(jse.number){
-      	case RS_X : ROS_INFO("Right JS X: %8hd",  state.stickR_x);
-      	break;
-      	case RS_Y : ROS_INFO("Right JS Y: %8hd", state.stickR_y);
-      	break;
-      	case LS_X : ROS_INFO("Left JS X: %8hd",  state.stickL_x);
-      	break;
-      	case LS_Y : ROS_INFO("Left JS Y: %8hd",  state.stickL_y);
-      	break; 
-      	default : break;
-      }
-
-
-  }
-    
-    get_joystick_status(&jse,&state);
-
-
-
-    // ROS_INFO("Event: time %8u, value %8hd, type: %3u, axis/button: %u\n",
-      // jse.time, jse.value, jse.type, jse.number);
-      //if(jse.type == 1)
-      //ROS_INFO("Controller state: A %d\n", cst.isPressed[0]);
-
-    }
-  }
 
 
 
@@ -284,7 +252,7 @@ while (!done) {
   // ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
   // ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
 
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(1000);
 
   /**
    * A count of how many messages we have sent. This is used to create
@@ -293,6 +261,85 @@ while (!done) {
   int count = 0;
   while (ros::ok())
   {
+	rc = read_joystick_event(&jse);
+
+	// usleep(1000);
+	if (rc == 1) {
+	// ROS_INFO("...: %d", jse->type);
+
+		ROS_INFO("type: %d", jse.type);
+		if(jse.type == 1){
+	switch(jse.number){
+	   /* case A :if(cst.isPressed[0]==1)
+				ROS_INFO("A is Pressed");
+				else
+					ROS_INFO("A is NOT Pressed");   break;
+	    case B :  if(cst.isPressed[1]==1)
+				ROS_INFO("B is Pressed");
+				else
+					ROS_INFO("B is NOT Pressed");break;
+	    case X :if(cst.isPressed[2]==1)
+				ROS_INFO("X is Pressed");
+				else
+					ROS_INFO("X is NOT Pressed");  break;
+	    case Y : if(cst.isPressed[3]==1)
+				ROS_INFO("Y is Pressed");
+				else
+					ROS_INFO("Y is NOT Pressed"); break;
+		case LB :  if(cst.isPressed[4]==1)
+				ROS_INFO("LEFT Bumper is Pressed");
+				else
+					ROS_INFO("LEFT Bumper is NOT Pressed");break;
+		case RB :  if(cst.isPressed[5]==1)
+				ROS_INFO("RIGHT Bumper is Pressed");
+				else
+					ROS_INFO("RIGHT Bumper is NOT Pressed");*/
+		case START : 
+			if(state.isPressed[START]==1)
+				ROS_INFO("START is Pressed");
+				else
+					ROS_INFO("START is NOT Pressed");
+		ROS_INFO("A state: %u", !state.isPressed[A]);
+		ROS_INFO("B state: %u", !state.isPressed[B]);
+		ROS_INFO("X state: %u", !state.isPressed[X]);
+		ROS_INFO("Y state: %u", !state.isPressed[Y]);
+		ROS_INFO("LB state: %u", !state.isPressed[LB]);
+		ROS_INFO("RB state: %u\n", !state.isPressed[RB]);
+		ROS_INFO("SELECT state: %u", !state.isPressed[SELECT]);
+		ROS_INFO("L3 state: %u", !state.isPressed[L3]);
+		ROS_INFO("R3 state: %u", !state.isPressed[R3]);
+
+		break;
+	    default : /*ROS_INFO(" pressed");*/ break;
+	  }
+	}else if (jse.type == 2){
+		switch(jse.number){
+	  	case RS_X : ROS_INFO("Right JS X: %8hd",  state.stickR_x);
+	  	break;
+	  	case RS_Y : ROS_INFO("Right JS Y: %8hd", state.stickR_y);
+	  	break;
+	  	case LS_X : ROS_INFO("Left JS X: %8hd",  state.stickL_x);
+	  	break;
+	  	case LS_Y : ROS_INFO("Left JS Y: %8hd",  state.stickL_y);
+	  	break; 
+	  	default : break;
+	  }
+
+
+	}
+
+	get_joystick_status(&jse,&state);
+	controller_pub.publish(state);
+
+
+
+	// ROS_INFO("Event: time %8u, value %8hd, type: %3u, axis/button: %u\n",
+	  // jse.time, jse.value, jse.type, jse.number);
+	  //if(jse.type == 1)
+	  //ROS_INFO("Controller state: A %d\n", cst.isPressed[0]);
+
+	}
+
 
     //ROS_INFO("%s", msg.data.c_str());
 

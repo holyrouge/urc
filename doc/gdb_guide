@@ -1,8 +1,28 @@
+==================================================================
+Make sure to ./scripts/clean and rebuild ONLY THE FIRST TIME because I didn't have a flag enabled to enable debugging stuff before this guide was written
+==================================================================
+
+
+==================================================================
+Commands
+==================================================================
 run
 runs code in real time
 
 start
 Runs code and sets breakpoint at main
+
+n
+next 
+Goes to next line in this source
+
+s
+step
+Steps into the code (goes into functions that are called)
+
+
+print VARNAME
+prints the variable named VARNAME
 
 where
 See what line we are on
@@ -10,6 +30,8 @@ See what line we are on
 ^C
 breaks code where we are
 
+
+Install CGDB:
 git clone git://github.com/cgdb/cgdb.git
 cd cgdb
 sudo apt-get install automake

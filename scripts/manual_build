@@ -13,7 +13,7 @@ fi
 # Let script run from top level or scripts folder
 SCRIPT=`realpath $0`
 SCRIPTPATH=`dirname $SCRIPT`
-MAKE_FLAGS="-DCMAKE_CXX_FLAGS=-Wall -DCMAKE_C_FLAGS=-Wall"
+MAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=-Wall -DCMAKE_C_FLAGS=-Wall"
 
 if [ $SCRIPTPATH == `pwd` ]; then
   cd ..

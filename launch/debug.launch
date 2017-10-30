@@ -1,4 +1,4 @@
 <launch>
   <node name="communication" pkg="tony" type="communication" output="screen"
-  launch-prefix="xterm -e gdb --args" />
+  launch-prefix="xterm -e cgdb --args" />
 </launch>

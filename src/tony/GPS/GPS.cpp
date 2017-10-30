@@ -32,7 +32,7 @@ void chatterCallbackDummy(const dummy::ConstPtr& msg)
     ROS_INFO("fixed[%d] = %d", i, msg->sized_demo[i]);
   }
 
-  for(int i = 0; i < msg->no_size_demo.size(); i++) {
+  for(unsigned int i = 0; i < msg->no_size_demo.size(); i++) {
     ROS_INFO("non fixed[%d] = %d", i, msg->no_size_demo[i]);
   }
 }

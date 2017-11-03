@@ -1,11 +1,12 @@
 #!/bin/bash
 
 if [ "$1" == "help" ]; then	
-	echo "Builds various packages."
-	echo "Usage: ./scripts/manual_build            | defaults to building tony"
-    echo "     : ./scripts/manual_build tony       | builds tony"
-    echo "     : ./scripts/manual_build all        | builds all packages"
-    echo "     : ./scripts/manual_build [package]  | builds package"
+	echo "Runs various packages with debugger."
+	echo "Usage: ./scripts/debug [-gdb OR -gui OR nothing] [-d] [p1] [-d] [p2] | if first param is -gdb or -gui launches with those. Otherwise launches with cgdb. Every package with -d before it launches in its own debugging window. Others launch and run live"
+	echo "Usage: ./scripts/debug -d [package1] -d [package2] [packag3] | launches cgdb debugging package1 and 2, with package 3 running without debugger "
+	echo "Usage: ./scripts/debug -gdb -d [package1] -d [package2] [packag3] | launches gdb debugging package1 and 2, with package 3 running without debugger "
+	echo "Usage: ./scripts/debug -gui -d [package1]  | launches gdbgui with package1 - not throughly tested "
+
     exit
 fi
 
@@ -34,6 +35,8 @@ echo "<launch>" > $launch_file
 
 
 debug_arg=false
+gui=false
+gdb=false
 for arg in "$@"; do
 	lower_case=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
 
@@ -41,12 +44,27 @@ for arg in "$@"; do
 		debug_arg=true
 		continue
   	else
-  		if $debug_arg; then
-  			echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"xterm -e cgdb -ex start --args\"/>" >> $launch_file
-			debug_arg=false
-		else
-			echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" />" >> $launch_file
-		fi
+  		if [ $lower_case == "-gui" ]; then
+			gui=true
+			continue
+		if [ $lower_case == "-gdv" ]; then
+			gdb=true
+			continue
+  		else
+	  		if $debug_arg; then
+				debug_arg=false
+	  			if $gui; then
+	  				echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"gdbgui\"/>" >> $launch_file
+	  			else
+	  				if $gdb; then
+	  					echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"xterm -e cgdb -ex start --args\"/>" >> $launch_file
+	  				else
+	  					echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"xterm -e gdb -ex start --args\"/>" >> $launch_file
+	  				fi
+	  			fi
+			else
+				echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" />" >> $launch_file
+			fi
 	fi
 
 done

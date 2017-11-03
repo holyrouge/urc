@@ -1,4 +1,3 @@
 <launch>
-  <node name="sample" pkg="tony" type="sample" output="screen" launch-prefix="xterm -e sudo cgdb --args" />
-  <node name="sample_listener" pkg="tony" type="sample_listener" output="screen" launch-prefix="xterm -e sudo cgdb --args" />
+	<node name="sample" pkg="tony" type="sample" output="screen" launch-prefix="xterm -e gdb -ex start --args"/>
 </launch>

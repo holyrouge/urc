@@ -44,3 +44,16 @@ sudo apt-get install libreadline6 libreadline6-dev
 make
 sudo make install
 sudo apt install cgdb
+
+
+gdb gui
+sudo apt-get install gdb python3
+sudo apt install python-pip
+
+
+pip install virtualenv  # run as sudo if this fails
+virtualenv venv -p python3  # creates a virtual env named "venv"
+source venv/bin/activate  # activates the virtualenv sandbox
+pip install pip --upgrade  # make sure pip is at the latest version
+
+pip install gdbgui --upgrade

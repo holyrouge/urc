@@ -1,4 +1,4 @@
 <launch>
-  <node name="communication" pkg="tony" type="communication" output="screen"
-  launch-prefix="xterm -e cgdb --args" />
+  <node name="sample" pkg="tony" type="sample" output="screen" launch-prefix="xterm -e sudo cgdb --args" />
+  <node name="sample_listener" pkg="tony" type="sample_listener" output="screen" launch-prefix="xterm -e sudo cgdb --args" />
 </launch>

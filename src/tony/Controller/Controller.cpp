@@ -275,6 +275,7 @@ bool testy() {
   // Make sure that we can change the file attributes.
   descriptor = open("/dev/ttyUSB0", O_RDWR);
   if(descriptor ==-1){
+    ROS_INFO("FUCK");
     return false;
   }
 
@@ -460,6 +461,13 @@ if (fd < 0) {
 
   ros::Rate loop_rate(1000);
 
+    if(testy())
+    ROS_INFO("Opened Successfully!");
+  else
+    ROS_INFO("Could not open");
+
+char buffer[10];
+
   /**
    * A count of how many messages we have sent. This is used to create
    * a unique string for each message.
@@ -473,7 +481,7 @@ if (fd < 0) {
   if (rc == 1) {
   // ROS_INFO("...: %d", jse->type);
 
-    ROS_INFO("type: %d", jse.type);
+    //ROS_INFO("type: %d", jse.type);
     if(jse.type == 1){
   switch(jse.number){
      /* case A :if(cst.isPressed[0]==1)
@@ -532,6 +540,9 @@ if (fd < 0) {
     }
 
     ROS_INFO("Speed:%d",state.stickL_y/-1024);
+    buffer[0]=state.stickL_y/-1024;
+  buffer[0] = 'U';
+  ::write(descriptor,buffer,1);
     
 
 
@@ -561,30 +572,22 @@ if (fd < 0) {
     ++count;
   }
 
-  if(testy())
-    ROS_INFO("Opened Successfully!");
-  else
-    ROS_INFO("Could not open");
+//buffer[0]=state.stickL_y/-1024;  //send speed value byte through buffer.
 
-char buffer[10];
+  // if(read(buffer, 10)){
+  //   ROS_INFO("Read stuff");
+  //   ROS_INFO("\n");
+  //   int i =0;
+  //   while (i<sizeof(buffer)){
+  //   ROS_INFO("0x%02x",buffer[i]);
+  //   ROS_INFO("\n");
+  //   i++;
+  //   }
 
-buffer[0]=state.stickL_y/-1024;  //send speed value byte through buffer.
-
-  if(read(buffer, 10)){
-    ROS_INFO("Read stuff");
-    ROS_INFO("\n");
-    int i =0;
-    while (i<sizeof(buffer)){
-    ROS_INFO("0x%02x",buffer[i]);
-    ROS_INFO("\n");
-    i++;
-    }
-
-  }
-  else{
-    ROS_INFO("No stuff read.");
-  }
-  ::write(descriptor,buffer,10);
+  // }
+  // else{
+  //   ROS_INFO("No stuff read.");
+  // }
 
 
   /*while(true) {

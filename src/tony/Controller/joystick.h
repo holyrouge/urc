@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #ifndef __JOYSTICK_H__
 #define __JOYSTICK_H__
@@ -25,7 +24,7 @@
 // #define DPAD_X 6
 // #define DPAD_Y 7
 
-#define JOYSTICK_DEVNAME "/dev/input/js0"
+#define JOYSTICK_DEVNAME "/dev/input/js1"
 
 #define JS_EVENT_BUTTON         0x01    /* button pressed/released */
 #define JS_EVENT_AXIS           0x02    /* joystick moved */

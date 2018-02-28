@@ -1,6 +1,42 @@
 #include "ros/ros.h"
-#include <stdlib.h>
 #include <sstream>
+#include "joystick.h"
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <stdlib.h>
+#include <string.h>     // string function definitions
+#include <errno.h>      // Error number definitions
+#include <termios.h>    // POSIX terminal control definitions
+
+#define DEADZONE 3200
+
+
+// #define HEADER      0
+#define FRONT_LEFT  0
+#define FRONT_RIGHT 1
+#define MID_LEFT    2
+#define MID_RIGHT   3
+#define BACK_LEFT   4
+#define BACK_RIGHT  5
+//#define CHECKSUM  
+
+//1 OR -1
+#define FRONT_LEFT_SIGN 1
+#define MID_LEFT_SIGN   -1
+#define BACK_LEFT_SIGN  -1
+
+#define FRONT_RIGHT_SIGN 1
+#define MID_RIGHT_SIGN   -1
+#define BACK_RIGHT_SIGN  -1
+
+
+
 
 
 /**
@@ -10,33 +46,460 @@
  */
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
-#include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
-#include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/controller.h"
+
+using namespace tony;
+
+static int joystick_fd = -1;
+
+
+
+const int A = 0;
+const int B = 1;
+const int X = 2;
+const int Y = 3;
+const int RB = 5;
+const int LB = 4;
+const int SELECT = 6;
+const int START = 7;
+const int XBOX = 8;
+const int L3 = 9; // left stick button
+const int R3 = 10; // left stick button
+const int LS_X = 0;
+const int LS_Y = 1;
+const int RS_X = 2;
+const int RS_Y = 3;
+const int RT = 4;
+const int LT = 5;
+const int DPAD_X = 6;
+const int DPAD_Y = 7;
+/**
+     * The name of the Device in the filesystem.
+     */
+    std::string name;
+
+    /**
+     * The file descriptor of the Device. This will be any
+     * nonnegative number if the Device is open, otherwise -1.
+     */
+    int descriptor;
+
+    /**
+     * Boolean flag indicating whether the Device is opened or not.
+     */
+    bool opened;
+
+    
+
+    /**
+     * Flag indicating that the termios struct for the device has been
+     * altered.
+     */
+    bool setTty;
+
+    /**
+     * Copy of the termios struct to reset after communication ends.
+     */
+    struct termios saveTty;
+
+int open_joystick()
+{
+  joystick_fd = open(JOYSTICK_DEVNAME, O_RDONLY | O_NONBLOCK); /* read write for force feedback? */
+  if (joystick_fd < 0)
+    return joystick_fd;
+
+  /* maybe ioctls to interrogate features here? */
+
+  return joystick_fd;
+}
+
+int read_joystick_event(struct js_event *jse)
+{
+  int bytes;
+
+  bytes = read(joystick_fd, jse, sizeof(*jse));
+
+  if (bytes == -1)
+    return 0;
+
+  if (bytes == sizeof(*jse))
+    return 1;
+
+
+  ROS_INFO("Unexpected bytes from joystick:%d\n", bytes);
+
+  return -1;
+}
+
+void close_joystick()
+{
+  close(joystick_fd);
+}
+
+int get_joystick_status(js_event *jse, controller *cst)
+{
+  int rc;
+  // struct js_event jse;
+  if (joystick_fd < 0)
+    return -1;
+
+  // memset(wjse, 0, sizeof(
+  // ROS_INFO("Hello");
+  // while ((rc = read_joystick_event(&jse) == 1)) {
+  jse->type &= ~JS_EVENT_INIT; // ignore synthetic events
+  // ROS_INFO("Hello!!");
+  
+
+
+
+/*
+   if (jse.type == JS_EVENT_AXIS) {
+    switch (jse.number) {
+    case 0: wjse->stick1_x = jse.value;
+      break;
+    case 1: wjse->stick1_y = jse.value;
+      break;
+    case 2: wjse->stick2_x = jse.value;
+      break;
+    case 3: wjse->stick2_y = jse.value;
+    break;
+    default:
+      break;
+    }
+  } else*/ if (jse->type == 1) {
+    //main buttons
+
+      switch(jse->number){
+        case A : cst->isPressed[A] = !cst->isPressed[A];  break;//A
+        case B : cst->isPressed[B] = !cst->isPressed[B]; break;//B
+        case X : cst->isPressed[X] = !cst->isPressed[X]; break;//X
+        case Y : cst->isPressed[Y] = !cst->isPressed[Y]; break;//Y
+        case LB : cst->isPressed[LB] = !cst->isPressed[LB]; break;//LEFT bumper
+        case RB : cst->isPressed[RB] = !cst->isPressed[RB]; break;//RIGHT bumper
+        case START : cst->isPressed[START] = !cst->isPressed[START]; break;
+        case L3 : cst->isPressed[L3] = !cst->isPressed[L3]; break;
+        case R3 : cst->isPressed[R3] = !cst->isPressed[R3]; break;
+        case SELECT : cst->isPressed[SELECT] = !cst->isPressed[SELECT]; break;
+        case XBOX : cst->isPressed[XBOX] = !cst->isPressed[XBOX]; break;
+
+        default : /*ROS_INFO("??? pressed");*/ break;
+        }
+      }else {
+
+        ///sticks
+      switch(jse->number){
+        case LS_X : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickL_x = jse->value;
+          else
+            cst->stickL_x = 0; 
+          break;
+        case LS_Y : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickL_y = jse->value;
+          else
+            cst->stickL_y = 0;  
+          break;
+        case RS_X : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickR_x = jse->value; 
+          else
+            cst->stickR_x = 0; 
+          break;
+        case RS_Y : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickR_y = jse->value; 
+          else
+            cst->stickR_y = 0; 
+          break;
+        case LT : cst->lt = jse->value; break;
+        case RT : cst->rt = jse->value; break;
+        case DPAD_X : cst->dpad_x = jse->value; break;
+        case DPAD_Y : cst->dpad_y = jse->value; break;
+        default : break;
+        }
+
+      }
+
+     // } // Weird while loop
+     //ROS_INFO("Pressed?: %d\n", cst->isPressed[0]);
+  // printf("%d\n", wjse->stick1_y);
+  return 0;
+}
+
+bool read(char* buffer, int numBytes) {
+
+  int bytesRead = 0;
+
+  while(numBytes > 0) {
+
+    bytesRead = ::read(descriptor, buffer, numBytes);
+
+    if(bytesRead > 0) {
+
+      buffer += bytesRead;
+      numBytes -= bytesRead;
+
+    } else {
+
+      ROS_INFO("No bytes read from device.");
+
+    }
+
+  }
+
+  // Return whether any bytes have been read.
+  if(numBytes > 0)
+    return false;
+  else
+    return true;
+
+}
+
+
+/*
+bool read(std::vector<byte>& bytes) {
+
+  // Grab the number of bytes to read, and a pointer to the buffer.
+  uint32 numBytes = bytes.size();
+  byte* bytePtr   = bytes.data();
+  
+  // Continue to read bytes until the desired number have been read, or until
+  // the read returns 0 bytes.
+  int bytesRead = 0;
+  while(numBytes > 0) {
+
+    bytesRead = ::read(descriptor, bytePtr, numBytes);
+
+    if(bytesRead == 0) break;
+    else if (bytesRead == -1) {
+      std::cout << "`read()` failed: " << errno << " Shit is fucked up." << std::endl;
+      break;
+    }
+
+    bytePtr += bytesRead;
+    numBytes -= bytesRead;
+
+  }
+
+  #ifdef DEBUG
+
+    // DEBUG: Indicate the bytes read from the device.
+    std::cout << "Bytes read from " << name << ": [";
+
+    for(auto c = bytes.begin(); c != bytes.end(); ++c) {
+
+      printf(" 0x%x", (int)(*c));
+
+    }
+
+    std::cout << "]" << std::endl;
+  #endif
+
+  // Return whether any bytes have been read.
+  if(numBytes > 0)
+    return true;
+  else
+    return false;
+
+}
+
+*/
+
+bool testy() {
+  
+  // Copy over the indicated baud rate.
+  //int baudRate = 115200;
+  int parity = 0; //must be 0
+  bool shouldBlock = false;
+  int timeout = 100000;
+  // Make sure that we can change the file attributes.
+  descriptor = open("/dev/ttyUSB0", O_RDWR);
+  if(descriptor ==-1){
+    ROS_INFO("FUCK");
+    return false;
+  }
+
+  opened =true;
+
+  if(!opened) {
+
+    return false;
+
+  } 
+
+  // Make sure the device is a serial device.
+  if(!isatty(descriptor)) {
+
+    return false;
+
+  }
+
+  // Create tele-type struct and zero out data.
+  struct termios tty;
+  memset (&tty, 0, sizeof(tty));
+
+  // Grab attributes for the current serial port.
+  if(tcgetattr(descriptor, &tty) != 0) {
+
+    ROS_INFO("Device: Could not load attributes from device.");
+    return false;
+  }
+
+  // Flush the port.
+  tcflush(descriptor, TCIOFLUSH);
+
+  // Save the termios attributes for later.
+  saveTty = tty;
+  setTty  = true;
+
+  // Set the baud rate.
+  cfsetspeed(&tty, 115200);
+  //cfsetospeed (&tty, B115200);
+    //cfsetispeed (&tty, B115200);
+
+  // Make the serial port "raw".
+  cfmakeraw(&tty);
+
+  // Input flags.
+  tty.c_iflag     |= IGNPAR | BRKINT;              // enable break processing
+  tty.c_iflag     &= ~(IXON | IXOFF | IXANY);      // shut off xon/xoff ctrl
+  
+  // Ouptput Flags
+  tty.c_oflag      = 0;                            // no remapping, no delays
+  
+  // Control Flags.
+  tty.c_cflag      = (tty.c_cflag & ~CSIZE) | CS8; // 8-bit chars
+  tty.c_cc[VMIN]   = (shouldBlock) ? 1 : 0;      // Indicate blocking.
+  tty.c_cc[VTIME]  = timeout;                  // 0.timeout seconds.
+  tty.c_cflag     |= CLOCAL;             // ignore modem controls,
+  tty.c_cflag     |= CREAD;            // enable reading
+  tty.c_cflag     &= ~(PARENB | PARODD);       // shut off parity
+  tty.c_cflag     |= parity;             // Set parity.
+  tty.c_cflag     &= ~CSTOPB;
+  tty.c_cflag     &= ~CRTSCTS;
+
+  // Disable Local Flags.
+    tty.c_lflag      = 0;
+    
+  // Set the attributes for the current serial port.
+  if(tcsetattr(descriptor, TCSANOW, &tty) != 0) {
+
+    ROS_INFO("Could not save attributes to device.");
+    return false;
+
+  }
+
+  // Flush the port.
+  tcflush(descriptor, TCIOFLUSH);
+
+  // Successfully configured the port.
+  return true;
+
+}
+
+void prepare_packet_write(char * buffer) {
+  char transmit_data[8];
+  transmit_data[0] = 0xFF;
+  transmit_data[FRONT_LEFT+1] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
+  transmit_data[MID_LEFT+1] = buffer[MID_LEFT] * MID_LEFT_SIGN;
+  transmit_data[BACK_LEFT+1] = buffer[BACK_LEFT] * BACK_LEFT_SIGN;
+  transmit_data[FRONT_RIGHT+1] = buffer[FRONT_RIGHT] * FRONT_RIGHT_SIGN;
+  transmit_data[MID_RIGHT+1] = buffer[MID_RIGHT] * MID_RIGHT_SIGN;
+  transmit_data[BACK_RIGHT+1] = buffer[BACK_RIGHT] * BACK_RIGHT_SIGN;
+
+  for(int i = 1 ; i < 7; i++) {
+    if(transmit_data[i] == 255)
+      transmit_data[i] = 254;
+  }
+
+   char sum = 0;
+   for(int i = 1; i < 7; i++) {
+    sum += transmit_data[i];
+   }
+   //sum = buffer[FRONT_LEFT] + buffer[MID_LEFT] + buffer[BACK_LEFT] + buffer[FRONT_RIGHT] + buffer[MID_RIGHT] + buffer[BACK_RIGHT];
+
+   transmit_data[7] = sum + 0xAA;
+   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
+   ::write(descriptor,transmit_data,8);
+
+}
+
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
-using namespace tony;
 int main(int argc, char **argv)
 {
-  /**
-   * The ros::init() function needs to see argc and argv so that it can perform
-   * any ROS arguments and name remapping that were provided at the command line.
-   * For programmatic remappings you can use a different version of init() which takes
-   * remappings directly, but for most command-line programs, passing argc and argv is
-   * the easiest way to do it.  The third argument to init() is the name of the node.
-   *
-   * You must call one of the versions of ros::init() before using any other
-   * part of the ROS system.
-   */
-  ros::init(argc, argv, "talker");
 
-  /**
-   * NodeHandle is the main access point to communications with the ROS system.
-   * The first NodeHandle constructed will fully initialize this node, and the last
-   * NodeHandle destructed will close down the node.
-   */
-  ros::NodeHandle n;
+ros::init(argc, argv, "talker");
+ros::NodeHandle n;
+
+ros::Publisher controller_pub = n.advertise<controller>("controller_data", 1000);
+
+controller state;
+//Joystick stuff
+
+int fd, rc;
+int done = 0;
+
+struct js_event jse;
+// struct wwvi_js_event wjse;
+// struct controller_state cst;
+
+for(int i=0; i<11;i++){
+  // cst.isPressed[i] =false;
+  state.isPressed[i]=false;
+}
+
+state.stickL_x=0;
+state.stickL_y=0;
+state.stickR_x=0;
+state.stickR_y=0;
+state.dpad_x=0;
+state.dpad_y=0;
+state.lt=0;
+state.rt=0;
+state.type=0;
+
+// A = state.A;
+// B = state.B;
+// X = state.X;
+// Y = state.Y;
+// RB = state.RB;
+// LB = state.LB;
+// SELECT = state.SELECT;
+// START = state.START;
+// XBOX = state.XBOX;
+// R3 = state.R3;
+
+// LS_X = state.LS_X;
+// LS_Y = state.LS_Y;
+// RS_X = state.RS_X;
+// RS_Y = state.RS_Y;
+// RT = state.RT;
+// LT = state.LT;
+// DPAD_X = state.DPAD_X;
+// DPAD_Y = state.DPAD_Y;
+
+
+state.NUM_BUTTONS;
+
+controller_pub.publish(state);
+
+fd = open_joystick();
+
+
+if (fd < 0) {
+  ROS_INFO("Controller failed to open.\n");
+  exit(1);
+}
+
+
+
+
+
+
 
   /**
    * The advertise() function is how you tell ROS that you want to
@@ -46,7 +509,9 @@ int main(int argc, char **argv)
    * node will notify anyone who is trying to subscribe to this topic name,
    * and they will in turn negotiate a peer-to-peer connection with this
    * node.  advertise() returns a Publisher object which allows you to
-   * publish messages on that topic through a call to publish().  Once
+   * publish messages on#include <stdio.h>
+
+ that topic through a call to publish().  Once
    * all copies of the returned Publisher object are destroyed, the topic
    * will be automatically unadvertised.
    *
@@ -56,14 +521,18 @@ int main(int argc, char **argv)
    * buffer up before throwing some away.
    */
 
-  // "chatter" is the name of the 'channel' of communication. The listener will 
+  // "chatter" is the name of the 'channel' of communication. The listener will
   // be looking for one called "chatter" for the string type for example
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+  // ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
   // ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
-  ros::Publisher dummy_pub = n.advertise<dummy>("chatter_dummy", 1000);
-  ros::Publisher gps_channel = n.advertise<raw_gps>("gps", 1000);
+  // ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
 
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(1000);
+
+    if(testy())
+    ROS_INFO("Radio Opened Successfully!");
+  else
+    ROS_INFO("Radio Could not open");
 
   /**
    * A count of how many messages we have sent. This is used to create
@@ -72,57 +541,216 @@ int main(int argc, char **argv)
   int count = 0;
   while (ros::ok())
   {
-    /**
-     * This is a message object. You stuff it with data, and then publish it.
-     */
-    std_msgs::String msg; 
+  rc = read_joystick_event(&jse);
 
-    std::stringstream ss;
-    ss << "hello world " << count;
-    msg.data = ss.str();
+  // usleep(1000);
+  if (rc == 1) {
+  // ROS_INFO("...: %d", jse->type);
 
-    ROS_INFO("%s", msg.data.c_str());
+    //ROS_INFO("type: %d", jse.type);
+    if(jse.type == 1){
+
+      if(jse.number == B) {
+      ROS_INFO("B presseed");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      buffer[FRONT_LEFT] = 0;
+      buffer[MID_LEFT] = 0;
+      buffer[BACK_LEFT] = 0;
+
+      buffer[FRONT_RIGHT] = 0;
+      buffer[MID_RIGHT] = 0;
+      buffer[BACK_RIGHT] = 0;
+
+      prepare_packet_write(buffer);
+    }
+  switch(jse.number){
+     /* case A :if(cst.isPressed[0]==1)
+        ROS_INFO("A is Pressed");
+        else
+          ROS_INFO("A is NOT Pressed");   break;
+      case B :  if(cst.isPressed[1]==1)
+        ROS_INFO("B is Pressed");
+        else
+          ROS_INFO("B is NOT Pressed");break;
+      case X :if(cst.isPressed[2]==1)
+        ROS_INFO("X is Pressed");
+        else
+          ROS_INFO("X is NOT Pressed");  break;
+      case Y : if(cst.isPressed[3]==1)
+        ROS_INFO("Y is Pressed");
+        else
+          ROS_INFO("Y is NOT Pressed"); break;
+    case LB :  if(cst.isPressed[4]==1)
+        ROS_INFO("LEFT Bumper is Pressed");
+        else
+          ROS_INFO("LEFT Bumper is NOT Pressed");break;
+    case RB :  if(cst.isPressed[5]==1)
+        ROS_INFO("RIGHT Bumper is Pressed");
+        else
+          ROS_INFO("RIGHT Bumper is NOT Pressed");*/
+    case START : 
+      if(state.isPressed[START]==1)
+        ROS_INFO("START is Pressed");
+        else
+          ROS_INFO("START is NOT Pressed");
+    ROS_INFO("A state: %u", !state.isPressed[A]);
+    ROS_INFO("B state: %u", !state.isPressed[B]);
+    ROS_INFO("X state: %u", !state.isPressed[X]);
+    ROS_INFO("Y state: %u", !state.isPressed[Y]);
+    ROS_INFO("LB state: %u", !state.isPressed[LB]);
+    ROS_INFO("RB state: %u\n", !state.isPressed[RB]);
+    ROS_INFO("SELECT state: %u", !state.isPressed[SELECT]);
+    ROS_INFO("L3 state: %u", !state.isPressed[L3]);
+    ROS_INFO("R3 state: %u", !state.isPressed[R3]);
+
+    break;
+      default : /*ROS_INFO(" pressed");*/ break;
+    }
+  }else if (jse.type == 2){
+    switch(jse.number){
+      case RS_X : ROS_INFO("Right JS X: %8hd, Right JS, Y: %8hd",  state.stickR_x, state.stickR_y);
+      break;
+      case RS_Y : ROS_INFO("Right JS X: %8hd, Right JS, Y: %8hd",  state.stickR_x, state.stickR_y);
+      break;
+      case LS_X : ROS_INFO("Left JS X: %8hd, Left JS, Y: %8hd",  state.stickL_x, state.stickL_y);
+      break;
+      case LS_Y : ROS_INFO("Left JS X: %8hd, Left JS, Y: %8hd",  state.stickL_x, state.stickL_y);
+      break; 
+      default : break;
+    }
+
+    
+    if(jse.number == LS_X || jse.number == LS_Y) {
+      ROS_INFO("Left stick");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      buffer[FRONT_LEFT] = state.stickL_y/-256;
+      buffer[MID_LEFT] = state.stickL_y/-256;
+      buffer[BACK_LEFT] = state.stickL_y/-256;
+
+      buffer[FRONT_RIGHT] = state.stickL_y/-256;
+      buffer[MID_RIGHT] = state.stickL_y/-256;
+      buffer[BACK_RIGHT] = state.stickL_y/-256;
+
+      prepare_packet_write(buffer);
+    }
+
+    if(jse.number == RT) {
+      ROS_INFO("Left stick");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      //ROS_INFO("RIGHT TRIGGEr: %8hd",  state.rt);
+      if(state.rt > 15000) {
+        buffer[FRONT_LEFT] = 64;
+        buffer[MID_LEFT] = 64;
+        buffer[BACK_LEFT] = 64;
+
+        buffer[FRONT_RIGHT] = -64;
+        buffer[MID_RIGHT] = -64;
+        buffer[BACK_RIGHT] = -64;
+      } else {
+        buffer[FRONT_LEFT] = 0;
+        buffer[MID_LEFT] = 0;
+        buffer[BACK_LEFT] = 0;
+
+        buffer[FRONT_RIGHT] = 0;
+        buffer[MID_RIGHT] = 0;
+        buffer[BACK_RIGHT] = 0;
+      }
+      prepare_packet_write(buffer);
+    }
+
+      if(jse.number == LT) {
+      ROS_INFO("Left stick");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      //ROS_INFO("RIGHT TRIGGEr: %8hd",  state.rt);
+      if(state.lt > 15000) {
+        buffer[FRONT_LEFT] = -64;
+        buffer[MID_LEFT] = -64;
+        buffer[BACK_LEFT] = -64;
+
+        buffer[FRONT_RIGHT] = 64;
+        buffer[MID_RIGHT] = 64;
+        buffer[BACK_RIGHT] = 64;
+      } else {
+        buffer[FRONT_LEFT] = 0;
+        buffer[MID_LEFT] = 0;
+        buffer[BACK_LEFT] = 0;
+
+        buffer[FRONT_RIGHT] = 0;
+        buffer[MID_RIGHT] = 0;
+        buffer[BACK_RIGHT] = 0;
+      }
+      prepare_packet_write(buffer);
+    }
 
 
-    /**
-     * The publish() function is how you send messages. The parameter
-     * is the message object. The type of this object must agree with the type
-     * given as a template parameter to the advertise<>() call, as was done
-     * in the constructor above.
-     */
-    chatter_pub.publish(msg);
 
-    // // Do the same except generate a random int
-    // std_msgs::Int8 msg_int;
-    // msg_int.data = std::rand() % 100;
-    // chatter_pub_int.publish(msg_int);
+    //buffer[0]=state.stickL_y/-1024;
+    //buffer[0] = 'U';
 
-    // Do the same except send a set of data with arbitrary types (this must be predefined in a .msg file)
-    dummy sample;
-    sample.x=50; 
-    sample.y=100;
-    sample.sized_demo[0] = 53;
-    sample.sized_demo[1] = 1312;
-    sample.sized_demo[2] = 134;
-    sample.no_size_demo.push_back(321);
-    sample.no_size_demo.push_back(32);
-    sample.no_size_demo.push_back(7899);
-    dummy_pub.publish(sample);
 
-    raw_gps gps;
-    gps.raw_gps_data.push_back(0);
-    gps.raw_gps_data.push_back(50);
-    gps.size_gps_data[0];
-    // gps.size_gps_data.push_back(50);
 
-    gps_channel.publish(gps);
+
+
+  }
+
+  get_joystick_status(&jse,&state);
+  controller_pub.publish(state);
+
+
+
+  // ROS_INFO("Event: time %8u, value %8hd, type: %3u, axis/button: %u\n",
+    // jse.time, jse.value, jse.type, jse.number);
+    //if(jse.type == 1)
+    //ROS_INFO("Controller state: A %d\n", cst.isPressed[0]);
+
+  }
+
+
+    //ROS_INFO("%s", msg.data.c_str());
 
     // Call this at end of "doing stuff"
     ros::spinOnce();
+
     loop_rate.sleep();
     ++count;
   }
 
+//buffer[0]=state.stickL_y/-1024;  //send speed value byte through buffer.
+
+  // if(read(buffer, 10)){
+  //   ROS_INFO("Read stuff");
+  //   ROS_INFO("\n");
+  //   int i =0;
+  //   while (i<sizeof(buffer)){
+  //   ROS_INFO("0x%02x",buffer[i]);
+  //   ROS_INFO("\n");
+  //   i++;
+  //   }
+
+  // }
+  // else{
+  //   ROS_INFO("No stuff read.");
+  // }
+
+
+  /*while(true) {
+  if(read(descriptor,buffer, 4)){
+    cout << " Reading stuff ";
+    }else
+    cout << "Nothing to read.";
+  }*/
+  
+
 
   return 0;
 }
+
+
+
+
+
+

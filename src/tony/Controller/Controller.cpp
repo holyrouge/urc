@@ -27,13 +27,13 @@
 //#define CHECKSUM  
 
 //1 OR -1
-#define FRONT_LEFT_SIGN -1
-#define MID_LEFT_SIGN   1
-#define BACK_LEFT_SIGN  1
+#define FRONT_LEFT_SIGN 1
+#define MID_LEFT_SIGN   -1
+#define BACK_LEFT_SIGN  -1
 
 #define FRONT_RIGHT_SIGN 1
-#define MID_RIGHT_SIGN   1
-#define BACK_RIGHT_SIGN  1
+#define MID_RIGHT_SIGN   -1
+#define BACK_RIGHT_SIGN  -1
 
 
 

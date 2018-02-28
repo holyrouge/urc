@@ -24,7 +24,7 @@
 // #define DPAD_X 6
 // #define DPAD_Y 7
 
-#define JOYSTICK_DEVNAME "/dev/input/js1"
+#define JOYSTICK_DEVNAME "/dev/input/js3"
 
 #define JS_EVENT_BUTTON         0x01    /* button pressed/released */
 #define JS_EVENT_AXIS           0x02    /* joystick moved */

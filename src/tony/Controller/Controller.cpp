@@ -9,13 +9,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#include <stdio.h>      // standard input / output functions
 #include <stdlib.h>
 #include <string.h>     // string function definitions
-//#include <unistd.h>     // UNIX standard function definitions
-//#include <fcntl.h>      // File control definitions
 #include <errno.h>      // Error number definitions
 #include <termios.h>    // POSIX terminal control definitions
+
+#define DEADZONE 3200
+
+
+// #define HEADER      0
+#define FRONT_LEFT  0
+#define FRONT_RIGHT 1
+#define MID_LEFT    2
+#define MID_RIGHT   3
+#define BACK_LEFT   4
+#define BACK_RIGHT  5
+//#define CHECKSUM  
+
+//1 OR -1
+#define FRONT_LEFT_SIGN -1
+#define MID_LEFT_SIGN   1
+#define BACK_LEFT_SIGN  1
+
+#define FRONT_RIGHT_SIGN 1
+#define MID_RIGHT_SIGN   1
+#define BACK_RIGHT_SIGN  1
+
+
 
 
 
@@ -166,11 +186,32 @@ int get_joystick_status(js_event *jse, controller *cst)
         }
       }else {
 
+        ///sticks
       switch(jse->number){
-        case LS_X : cst->stickL_x = jse->value; break;
-        case LS_Y : cst->stickL_y = jse->value; break;
-        case RS_X : cst->stickR_x = jse->value; break;
-        case RS_Y : cst->stickR_y = jse->value; break;
+        case LS_X : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickL_x = jse->value;
+          else
+            cst->stickL_x = 0; 
+          break;
+        case LS_Y : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickL_y = jse->value;
+          else
+            cst->stickL_y = 0;  
+          break;
+        case RS_X : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickR_x = jse->value; 
+          else
+            cst->stickR_x = 0; 
+          break;
+        case RS_Y : 
+          if(jse->value > DEADZONE || jse->value < -1*DEADZONE)
+            cst->stickR_y = jse->value; 
+          else
+            cst->stickR_y = 0; 
+          break;
         case LT : cst->lt = jse->value; break;
         case RT : cst->rt = jse->value; break;
         case DPAD_X : cst->dpad_x = jse->value; break;
@@ -357,6 +398,33 @@ bool testy() {
 
 }
 
+void prepare_packet_write(char * buffer) {
+  char transmit_data[8];
+  transmit_data[0] = 0xFF;
+  transmit_data[FRONT_LEFT+1] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
+  transmit_data[MID_LEFT+1] = buffer[MID_LEFT] * MID_LEFT_SIGN;
+  transmit_data[BACK_LEFT+1] = buffer[BACK_LEFT] * BACK_LEFT_SIGN;
+  transmit_data[FRONT_RIGHT+1] = buffer[FRONT_RIGHT] * FRONT_RIGHT_SIGN;
+  transmit_data[MID_RIGHT+1] = buffer[MID_RIGHT] * MID_RIGHT_SIGN;
+  transmit_data[BACK_RIGHT+1] = buffer[BACK_RIGHT] * BACK_RIGHT_SIGN;
+
+  for(int i = 1 ; i < 7; i++) {
+    if(transmit_data[i] == 255)
+      transmit_data[i] = 254;
+  }
+
+   char sum = 0;
+   for(int i = 1; i < 7; i++) {
+    sum += transmit_data[i];
+   }
+   //sum = buffer[FRONT_LEFT] + buffer[MID_LEFT] + buffer[BACK_LEFT] + buffer[FRONT_RIGHT] + buffer[MID_RIGHT] + buffer[BACK_RIGHT];
+
+   transmit_data[7] = sum + 0xAA;
+   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
+   ::write(descriptor,transmit_data,8);
+
+}
+
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
@@ -462,11 +530,9 @@ if (fd < 0) {
   ros::Rate loop_rate(1000);
 
     if(testy())
-    ROS_INFO("Opened Successfully!");
+    ROS_INFO("Radio Opened Successfully!");
   else
-    ROS_INFO("Could not open");
-
-char buffer[10];
+    ROS_INFO("Radio Could not open");
 
   /**
    * A count of how many messages we have sent. This is used to create
@@ -483,6 +549,21 @@ char buffer[10];
 
     //ROS_INFO("type: %d", jse.type);
     if(jse.type == 1){
+
+      if(jse.number == B) {
+      ROS_INFO("B presseed");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      buffer[FRONT_LEFT] = 0;
+      buffer[MID_LEFT] = 0;
+      buffer[BACK_LEFT] = 0;
+
+      buffer[FRONT_RIGHT] = 0;
+      buffer[MID_RIGHT] = 0;
+      buffer[BACK_RIGHT] = 0;
+
+      prepare_packet_write(buffer);
+    }
   switch(jse.number){
      /* case A :if(cst.isPressed[0]==1)
         ROS_INFO("A is Pressed");
@@ -528,22 +609,88 @@ char buffer[10];
     }
   }else if (jse.type == 2){
     switch(jse.number){
-      case RS_X : ROS_INFO("Right JS X: %8hd",  state.stickR_x);
+      case RS_X : ROS_INFO("Right JS X: %8hd, Right JS, Y: %8hd",  state.stickR_x, state.stickR_y);
       break;
-      case RS_Y : ROS_INFO("Right JS Y: %8hd", state.stickR_y);
+      case RS_Y : ROS_INFO("Right JS X: %8hd, Right JS, Y: %8hd",  state.stickR_x, state.stickR_y);
       break;
-      case LS_X : ROS_INFO("Left JS X: %8hd",  state.stickL_x);
+      case LS_X : ROS_INFO("Left JS X: %8hd, Left JS, Y: %8hd",  state.stickL_x, state.stickL_y);
       break;
-      case LS_Y : ROS_INFO("Left JS Y: %8hd",  state.stickL_y);
+      case LS_Y : ROS_INFO("Left JS X: %8hd, Left JS, Y: %8hd",  state.stickL_x, state.stickL_y);
       break; 
       default : break;
     }
 
-    ROS_INFO("Speed:%d",state.stickL_y/-1024);
-    buffer[0]=state.stickL_y/-1024;
-  buffer[0] = 'U';
-  ::write(descriptor,buffer,1);
     
+    if(jse.number == LS_X || jse.number == LS_Y) {
+      ROS_INFO("Left stick");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      buffer[FRONT_LEFT] = state.stickL_y/-256;
+      buffer[MID_LEFT] = state.stickL_y/-256;
+      buffer[BACK_LEFT] = state.stickL_y/-256;
+
+      buffer[FRONT_RIGHT] = state.stickL_y/-256;
+      buffer[MID_RIGHT] = state.stickL_y/-256;
+      buffer[BACK_RIGHT] = state.stickL_y/-256;
+
+      prepare_packet_write(buffer);
+    }
+
+    if(jse.number == RT) {
+      ROS_INFO("Left stick");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      //ROS_INFO("RIGHT TRIGGEr: %8hd",  state.rt);
+      if(state.rt > 15000) {
+        buffer[FRONT_LEFT] = 64;
+        buffer[MID_LEFT] = 64;
+        buffer[BACK_LEFT] = 64;
+
+        buffer[FRONT_RIGHT] = -64;
+        buffer[MID_RIGHT] = -64;
+        buffer[BACK_RIGHT] = -64;
+      } else {
+        buffer[FRONT_LEFT] = 0;
+        buffer[MID_LEFT] = 0;
+        buffer[BACK_LEFT] = 0;
+
+        buffer[FRONT_RIGHT] = 0;
+        buffer[MID_RIGHT] = 0;
+        buffer[BACK_RIGHT] = 0;
+      }
+      prepare_packet_write(buffer);
+    }
+
+      if(jse.number == LT) {
+      ROS_INFO("Left stick");
+      char buffer[8];
+      // buffer[HEADER] = 0xFF;
+      //ROS_INFO("RIGHT TRIGGEr: %8hd",  state.rt);
+      if(state.lt > 15000) {
+        buffer[FRONT_LEFT] = -64;
+        buffer[MID_LEFT] = -64;
+        buffer[BACK_LEFT] = -64;
+
+        buffer[FRONT_RIGHT] = 64;
+        buffer[MID_RIGHT] = 64;
+        buffer[BACK_RIGHT] = 64;
+      } else {
+        buffer[FRONT_LEFT] = 0;
+        buffer[MID_LEFT] = 0;
+        buffer[BACK_LEFT] = 0;
+
+        buffer[FRONT_RIGHT] = 0;
+        buffer[MID_RIGHT] = 0;
+        buffer[BACK_RIGHT] = 0;
+      }
+      prepare_packet_write(buffer);
+    }
+
+
+
+    //buffer[0]=state.stickL_y/-1024;
+    //buffer[0] = 'U';
+
 
 
 

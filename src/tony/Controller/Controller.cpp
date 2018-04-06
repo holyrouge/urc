@@ -444,7 +444,7 @@ void prepare_packet_write(char * buffer) {
   if(jse.type == JS_EVENT_BUTTON){ // Button press 
 
     if(jse.number == B) {
-      ROS_INFO("B presseed");
+      ROS_INFO("B presseed Stopping rover");
       char buffer[8];
       // buffer[HEADER] = 0xFF;
       buffer[FRONT_LEFT] = 0;
@@ -555,15 +555,8 @@ void prepare_packet_write(char * buffer) {
       prepare_packet_write(buffer);
     }
 
-
-
     //buffer[0]=state.stickL_y/-1024;
     //buffer[0] = 'U';
-
-
-
-
-
   }
 
   get_joystick_status(&jse,&state);

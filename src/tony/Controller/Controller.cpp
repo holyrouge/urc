@@ -47,6 +47,7 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
 #include "tony/controller.h"
+#include "tony/arm.h"
 
 using namespace tony;
 

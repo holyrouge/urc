@@ -1,4 +1,3 @@
-#include "ros/ros.h"
 #include <sstream>
 #include "joystick.h"
 #include <stdio.h>
@@ -14,30 +13,7 @@
 #include <errno.h>      // Error number definitions
 #include <termios.h>    // POSIX terminal control definitions
 
-#define DEADZONE 3200
-
-
-// #define HEADER      0
-#define FRONT_LEFT  0
-#define FRONT_RIGHT 1
-#define MID_LEFT    2
-#define MID_RIGHT   3
-#define BACK_LEFT   4
-#define BACK_RIGHT  5
-//#define CHECKSUM  
-
-//1 OR -1
-#define FRONT_LEFT_SIGN 1
-#define MID_LEFT_SIGN   -1
-#define BACK_LEFT_SIGN  -1
-
-#define FRONT_RIGHT_SIGN 1
-#define MID_RIGHT_SIGN   -1
-#define BACK_RIGHT_SIGN  -1
-
-
-
-
+#include "Controller.h"
 
 /**
  * Make sure to include the standard types for any messages you send and any
@@ -48,12 +24,12 @@
 #include <std_msgs/Int8.h>
 #include "tony/controller.h"
 #include "tony/arm.h"
+#include "tony/motor.h"
 
 using namespace tony;
 
 //File descriptor initialized to -1 because it is unopened
 static int joystick_fd = -1;
-
 
 // These are given by how xboxdrv data show up
 const int A = 0;
@@ -75,34 +51,6 @@ const int RT = 4;
 const int LT = 5;
 const int DPAD_X = 6;
 const int DPAD_Y = 7;
-/**
-     * The name of the Device in the filesystem.
-     */
-std::string name;
-
-    /**
-     * The file descriptor of the Device. This will be any
-     * nonnegative number if the Device is open, otherwise -1.
-     */
-int descriptor;
-
-    /**
-     * Boolean flag indicating whether the Device is opened or not.
-     */
-bool opened;
-
-
-
-    /**
-     * Flag indicating that the termios struct for the device has been
-     * altered.
-     */
-bool setTty;
-
-    /**
-     * Copy of the termios struct to reset after communication ends.
-     */
-struct termios saveTty;
 
 
 //Opens xboxcontroller as a file
@@ -214,173 +162,44 @@ int get_joystick_status(js_event *jse, controller *cst)
   }
 
 
-// Read from radio
-  bool read(char* buffer, int numBytes) {
-
-    int bytesRead = 0;
-
-    while(numBytes > 0) {
-
-      bytesRead = ::read(descriptor, buffer, numBytes);
-
-      if(bytesRead > 0) {
-
-        buffer += bytesRead;
-        numBytes -= bytesRead;
-
-      } else {
-
-        ROS_INFO("No bytes read from device.");
-
-      }
-    }
-  // Return whether any bytes have been read.
-    if(numBytes > 0)
-      return false;
-    else
-      return true;
-
-  }
-
-//Open radio device
-  bool open_radio() {
-
-  // Copy over the indicated baud rate.
-  //int baudRate = 115200;
-  int parity = 0; //must be 0
-  bool shouldBlock = false;
-  int timeout = 100000;
-  // Make sure that we can change the file attributes.
-  descriptor = open("/dev/ttyUSB0", O_RDWR);
-  if(descriptor ==-1){
-    ROS_INFO("RADIO FAILED TO OPEN. IGNORING");
-    return false;
-  }
-
-  opened =true;
-
-  if(!opened) {
-
-    return false;
-
-  } 
-
-  // Make sure the device is a serial device.
-  if(!isatty(descriptor)) {
-
-    return false;
-
-  }
-
-  // Create tele-type struct and zero out data.
-  struct termios tty;
-  memset (&tty, 0, sizeof(tty));
-
-  // Grab attributes for the current serial port.
-  if(tcgetattr(descriptor, &tty) != 0) {
-
-    ROS_INFO("Device: Could not load attributes from device.");
-    return false;
-  }
-
-  // Flush the port.
-  tcflush(descriptor, TCIOFLUSH);
-
-  // Save the termios attributes for later.
-  saveTty = tty;
-  setTty  = true;
-
-  // Set the baud rate.
-  cfsetspeed(&tty, 115200);
-  //cfsetospeed (&tty, B115200);
-    //cfsetispeed (&tty, B115200);
-
-  // Make the serial port "raw".
-  cfmakeraw(&tty);
-
-  // Input flags.
-  tty.c_iflag     |= IGNPAR | BRKINT;              // enable break processing
-  tty.c_iflag     &= ~(IXON | IXOFF | IXANY);      // shut off xon/xoff ctrl
-  
-  // Ouptput Flags
-  tty.c_oflag      = 0;                            // no remapping, no delays
-  
-  // Control Flags.
-  tty.c_cflag      = (tty.c_cflag & ~CSIZE) | CS8; // 8-bit chars
-  tty.c_cc[VMIN]   = (shouldBlock) ? 1 : 0;      // Indicate blocking.
-  tty.c_cc[VTIME]  = timeout;                  // 0.timeout seconds.
-  tty.c_cflag     |= CLOCAL;             // ignore modem controls,
-  tty.c_cflag     |= CREAD;            // enable reading
-  tty.c_cflag     &= ~(PARENB | PARODD);       // shut off parity
-  tty.c_cflag     |= parity;             // Set parity.
-  tty.c_cflag     &= ~CSTOPB;
-  tty.c_cflag     &= ~CRTSCTS;
-
-  // Disable Local Flags.
-  tty.c_lflag      = 0;
-
-  // Set the attributes for the current serial port.
-  if(tcsetattr(descriptor, TCSANOW, &tty) != 0) {
-
-    ROS_INFO("Could not save attributes to device.");
-    return false;
-
-  }
-
-  // Flush the port.
-  tcflush(descriptor, TCIOFLUSH);
-
-  // Successfully configured the port.
-  return true;
-
-}
-
-
 /* Calculates checksum and prepares data packet for SAR video movement
 *
 * This is not written to be modified easily... it assumes a few things.
 * Takes in array of 6 speeds of motors, adds init data, and checksum. 
 * Also multiplies some things by negative 1 if motors are plugged in
 * backwards. 
+*
+* pub: publisher to publish data
+* buffer: data to publish
+*
+* 4/6/18: Writes data to motor.msg. 
 */
-void prepare_packet_write(char * buffer) {
-  char transmit_data[8];
-  transmit_data[0] = 0xFF; // Start of packet = 0xFF by specs
-  transmit_data[FRONT_LEFT+1] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
-  transmit_data[MID_LEFT+1] = buffer[MID_LEFT] * MID_LEFT_SIGN;
-  transmit_data[BACK_LEFT+1] = buffer[BACK_LEFT] * BACK_LEFT_SIGN;
-  transmit_data[FRONT_RIGHT+1] = buffer[FRONT_RIGHT] * FRONT_RIGHT_SIGN;
-  transmit_data[MID_RIGHT+1] = buffer[MID_RIGHT] * MID_RIGHT_SIGN;
-  transmit_data[BACK_RIGHT+1] = buffer[BACK_RIGHT] * BACK_RIGHT_SIGN;
+void prepare_packet_write(char * buffer, ros::Publisher pub) {
+  int len = 6;
+  char transmit_data[len];
+  transmit_data[FRONT_LEFT] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
+  transmit_data[MID_LEFT] = buffer[MID_LEFT] * MID_LEFT_SIGN;
+  transmit_data[BACK_LEFT] = buffer[BACK_LEFT] * BACK_LEFT_SIGN;
+  transmit_data[FRONT_RIGHT] = buffer[FRONT_RIGHT] * FRONT_RIGHT_SIGN;
+  transmit_data[MID_RIGHT] = buffer[MID_RIGHT] * MID_RIGHT_SIGN;
+  transmit_data[BACK_RIGHT] = buffer[BACK_RIGHT] * BACK_RIGHT_SIGN;
 
-  //Don't want to trandmit 255, this is used as special data... to make it easier
-  for(int i = 1 ; i < 7; i++) {
-    if(transmit_data[i] == 255)
-      transmit_data[i] = 254;
-  }
-
-
-  // Checksum is sum of all data in packet (Not header) + 0xAA
-  char sum = 0;
-  for(int i = 1; i < 7; i++) {
-    sum += transmit_data[i];
-  }
-   //sum = buffer[FRONT_LEFT] + buffer[MID_LEFT] + buffer[BACK_LEFT] + buffer[FRONT_RIGHT] + buffer[MID_RIGHT] + buffer[BACK_RIGHT];
-
-  transmit_data[7] = sum + 0xAA;
-   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
-   ::write(descriptor,transmit_data,8); // Transmit 8 bits
-
+  motor msg;
+  for(int i = 0; i < len; i++)
+    msg.motor_packet[i] = transmit_data[i];
+  pub.publish(msg);
+  return;
  }
 
 
- int main(int argc, char **argv)
+int main(int argc, char **argv)
  {
 
   ros::init(argc, argv, "talker");
   ros::NodeHandle n;
 
   ros::Publisher controller_pub = n.advertise<controller>("controller_data", 1000);
+  ros::Publisher controller_pub_motor = n.advertise<motor>("motor_data", 1000);
 
   controller state;
 //Joystick stuff
@@ -420,10 +239,7 @@ void prepare_packet_write(char * buffer) {
 
   ros::Rate loop_rate(1000);
 
-  if(open_radio())
-    ROS_INFO("Radio Opened Successfully!");
-  else
-    ROS_INFO("Radio Could not open");
+
 
   /**
    * A count of how many messages we have sent. This is used to create
@@ -456,7 +272,7 @@ void prepare_packet_write(char * buffer) {
       buffer[MID_RIGHT] = 0;
       buffer[BACK_RIGHT] = 0;
 
-      prepare_packet_write(buffer);
+      prepare_packet_write(buffer, controller_pub_motor);
     }
     switch(jse.number){
       case START : 
@@ -503,7 +319,7 @@ void prepare_packet_write(char * buffer) {
       buffer[MID_RIGHT] = state.stickL_y/-256;
       buffer[BACK_RIGHT] = state.stickL_y/-256;
 
-      prepare_packet_write(buffer);
+      prepare_packet_write(buffer, controller_pub_motor);
     }
 
     if(jse.number == RT) {
@@ -528,7 +344,7 @@ void prepare_packet_write(char * buffer) {
         buffer[MID_RIGHT] = 0;
         buffer[BACK_RIGHT] = 0;
       }
-      prepare_packet_write(buffer);
+      prepare_packet_write(buffer, controller_pub_motor);
     }
 
     if(jse.number == LT) {
@@ -553,7 +369,7 @@ void prepare_packet_write(char * buffer) {
         buffer[MID_RIGHT] = 0;
         buffer[BACK_RIGHT] = 0;
       }
-      prepare_packet_write(buffer);
+      prepare_packet_write(buffer, controller_pub_motor);
     }
 
     //buffer[0]=state.stickL_y/-1024;

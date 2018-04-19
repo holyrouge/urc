@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
 
 #include <stdlib.h>
 #include <string.h>     // string function definitions
@@ -104,7 +105,18 @@ const int DPAD_Y = 7;
 
 int open_joystick()
 {
-  joystick_fd = open(JOYSTICK_DEVNAME, O_RDONLY | O_NONBLOCK); /* read write for force feedback? */
+
+  std::ifstream jsFile; // a better name may be in order to avoid confusion
+  jsFile.open("../urc2018/src/tony/Controller/js.txt");
+  char js[256];
+
+  std::string line = "test";
+  if (jsFile.is_open()) {
+    std::getline(jsFile, line);
+    ROS_INFO(line.c_str());
+  }
+  
+  joystick_fd = open(line.c_str(), O_RDONLY | O_NONBLOCK); /* read write for force feedback? */
   if (joystick_fd < 0)
     return joystick_fd;
 

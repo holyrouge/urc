@@ -365,7 +365,7 @@ bool testy()
   bool shouldBlock = false;
   int timeout = 100000;
   // Make sure that we can change the file attributes.
-  descriptor = open("/dev/ttyUSB0", O_RDWR);
+  descriptor = open("/dev/ttyACM0", O_RDWR);
   if (descriptor == -1)
   {
     ROS_INFO("FUCK");
@@ -524,6 +524,7 @@ int main(int argc, char **argv)
   int fd, rc;
   int done = 0;
 
+  char killPacket[] = {'0','0','0','0','0','0','0','0'};
   toggleControl = false; // by default we'll control the rover
   verticalControl = false;
 
@@ -740,10 +741,12 @@ int main(int argc, char **argv)
           if (toggleControl)
           {
             ROS_INFO("arm");
+            prepare_packet_write(killPacket);
           }
           else
           {
             ROS_INFO("rover");
+            prepare_arm_packet_write(killPacket);
           }
           break;
         case START:

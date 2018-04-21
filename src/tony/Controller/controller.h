@@ -15,6 +15,15 @@
 #define BACK_RIGHT  5
 //#define CHECKSUM  
 
+//For the arm
+#define BASE_ARM 1
+#define VERTICAL_TOGGLE 2
+#define VERTICAL 3
+#define WRIST_PITCH 4
+#define WRIST_ROTATION 5
+#define HAND_CONTROL 6
+
+
 //1 OR -1
 #define FRONT_LEFT_SIGN 1
 #define MID_LEFT_SIGN   -1

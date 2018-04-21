@@ -160,7 +160,11 @@ void motor_function(const tony::motor::ConstPtr& mmsg) {
  * Callback for arm msg subscriber. Generates and wrtites packet to radio.
  */
 void arm_function(const tony::arm::ConstPtr& amsg) {
-  //prepare_and_write_packet(amsg->arm_packet, amsg->NUM_BYTES, amsg->HEADER, amsg->MAGIC_NUMBER);
+  if(amsg->NUM_BYTES > MAX_PAYLOAD) return;
+  uint8 data[MAX_PAYLOAD];
+  for(int i = 0; i < amsg->NUM_BYTES+2; i++)
+      data[i] = amsg->arm_packet[i];
+  prepare_and_write_packet(data, amsg->NUM_BYTES, amsg->HEADER, amsg->MAGIC_NUMBER);
   return;
 }
 

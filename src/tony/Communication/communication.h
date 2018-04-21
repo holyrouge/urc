@@ -1,6 +1,12 @@
+#ifndef __COMMUNICATION_H_INCLUDED__
+#define __COMMUNICATION_H_INCLUDED__
+
 #include "ros/ros.h"
 
+#define MAX_PAYLOAD 1000
+
 typedef unsigned char uint8;
+
 
 /**
  * The file descriptor of the Device. This will be any
@@ -26,37 +32,12 @@ bool setTty;
  */
 struct termios saveTty;
 
-/**
-* Open radio device
-*/
+
 bool open_radio();
-
-/**
-* Read from radio
-*/
 bool read(char *buffer, int numBytes);
-
 void motor_function();
-
 void arm_function();
-
-/**
-* adds header and checksum to packet
-* writes packet to radio file descriptor
-*
-* data: array of data to be written
-* header: header of packet
-* magic_number: for checksum
-* num_bytes: length of data
-*/
 void prepare_and_write_packet(uint8 *data, int num_bytes, uint8 header, uint8 magic_number);
+uint8 calc_checksum(uint8 *packet, uint8 magic_number, int num_bytes);
 
-/*
-* Determines checksum for packet delivery.
-*
-* packet: the packet to clac checksum for.
-* num_bytes: payload length.
-*
-*/
-uint8 calc_checksum(uint8 *packet, uint8 num_bytes);
-
+#endif

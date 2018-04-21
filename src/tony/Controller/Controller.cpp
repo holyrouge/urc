@@ -13,7 +13,7 @@
 #include <errno.h>      // Error number definitions
 #include <termios.h>    // POSIX terminal control definitions
 
-#include "Controller.h"
+#include "controller.h"
 
 /**
  * Make sure to include the standard types for any messages you send and any
@@ -174,7 +174,7 @@ int get_joystick_status(js_event *jse, controller *cst)
 *
 * 4/6/18: Writes data to motor.msg. 
 */
-void prepare_packet_write(char * buffer, ros::Publisher pub) {
+void prepare_packet_write(char *buffer, ros::Publisher pub) {
   int len = 6;
   char transmit_data[len];
   transmit_data[FRONT_LEFT] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;

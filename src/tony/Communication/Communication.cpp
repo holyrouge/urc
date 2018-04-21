@@ -17,10 +17,10 @@
  */
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
-#include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
-#include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/arm.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/motor.h" // see beginner_tutorials/msg/coord.msg
 
-#include "Communication.h"
+#include "communication.h"
 
 
 
@@ -137,71 +137,92 @@ bool read(char* buffer, int numBytes){
 
       }
     }
-  // Return whether any bytes have been read.
+    // Return whether any bytes have been read.
     if(numBytes > 0)
       return false;
     else
       return true;
 }
 
-
-
-void motor_function() {
-  //Call prepare_and_write_packet(data, header from msg, magic number from msg)
+/**
+ * Callback for motor msg subscriber. Generates and wrtites packet to radio.
+ */
+void motor_function(const tony::motor::ConstPtr& mmsg) {
+  if(mmsg->NUM_BYTES > MAX_PAYLOAD) return;
+  uint8 data[MAX_PAYLOAD];
+  for(int i = 0; i < mmsg->NUM_BYTES+2; i++)
+      data[i] = mmsg->motor_packet[i];
+  prepare_and_write_packet(data, mmsg->NUM_BYTES, mmsg->HEADER, mmsg->MAGIC_NUMBER);
   return;
 }
 
-void arm_function() {
-  //Call prepare_and_write_packet(data, header from msg, magic number from msg)
+/**
+ * Callback for arm msg subscriber. Generates and wrtites packet to radio.
+ */
+void arm_function(const tony::arm::ConstPtr& amsg) {
+  //prepare_and_write_packet(amsg->arm_packet, amsg->NUM_BYTES, amsg->HEADER, amsg->MAGIC_NUMBER);
   return;
 }
 
 
+/**
+ * Adds header and checksum to payload
+ * writes packet to radio file descriptor
+ *
+ * data: array of data to be written, the payload
+ * header: header of packet
+ * magic_number: for checksum, taken from approrpiate msg
+ * num_bytes: length of data 
+ */
 void prepare_and_write_packet(uint8 *data, int num_bytes, uint8 header, uint8 magic_number) {
-  uint8 *packet;
-
-  packet[0] = header;//Set 0th byte as header
-  for(int i = 1; i <= num_bytes; i++){//set bytes 1-N as data
+  uint8 *packet = (uint8 *)malloc((size_t)(num_bytes+2)); // Plus header byte and checksum byte
+  packet[0] = header;                            // Set 0th byte as header
+  
+  for(int i = 1; i <= num_bytes; i++)            // Set bytes 1-N as data
     packet[i] = data[i];
-  }
-  uint8 checksum = calc_checksum(packet, num_bytes);
-  packet[num_bytes+1] = checksum;//set last byte as checksum
+  uint8 checksum = calc_checksum(packet, magic_number, num_bytes);
+  packet[num_bytes+1] = checksum;                // Set last byte as checksum
 
-  ::write(descriptor, packet, num_bytes+2); // Transmit 8 bits  Call ::write function with new data packet
+  ::write(descriptor, packet, num_bytes+2);      // Transmit 8 bits  Call ::write function with new data packet
+  free(packet);
   return;
 }
 
-uint8 calc_checksum(uint8 *packet, uint8 num_bytes) {
-  //Write this as specified in the table
-  //Don't want to trandmit 255, this is used as special data... to make it easier
-  /*for(int i = 1 ; i < 7; i++) {
-    if(transmit_data[i] == 255)
-      transmit_data[i] = 254;
-  }*/
-
-
-  // Checksum is sum of all data in packet (Not header) + 0xAA
-  /*char sum = 0;
-  for(int i = 1; i < 7; i++) {
-    sum += buffer[i];
-  }*/
-   //sum = buffer[FRONT_LEFT] + buffer[MID_LEFT] + buffer[BACK_LEFT] + buffer[FRONT_RIGHT] + buffer[MID_RIGHT] + buffer[BACK_RIGHT];
-  return 0;
-
+/*
+* Determines checksum for packet delivery.
+*
+* packet: the packet to clac checksum for. Points to header.
+* num_bytes: payload length. (does not include header length)
+* magic_number: taken from appropriate msg file. 
+*/
+uint8 calc_checksum(uint8 *packet, uint8 magic_number, int num_bytes) {
+  uint8 checksum;
+  for(int i = 1; i <= num_bytes; i++) // Sum of num_bytes of payload 
+    checksum += packet[i];
+  checksum += magic_number; 
+  checksum %= 255; 
+  return checksum;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   
   ros::init(argc, argv, "communication");
 
   ros::NodeHandle n;
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(10); 
 
+  int q_size = 1000; // Change this as needed
+  // Listen to arm and motor channels. Add to this as necessary.
+  ros::Subscriber arm_sub = n.subscribe("arm_data", q_size, arm_function);
+  ros::Subscriber motor_sub = n.subscribe("motor_data", q_size, motor_function);
   
   int count = 0;
   while (ros::ok())
   {
+    //sendheartbeat()
+
+    ros::spinOnce();
+    loop_rate.sleep();
   }
 
 

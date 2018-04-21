@@ -1,3 +1,6 @@
+#ifndef __CONTROLLER_H_INCLUDED__
+#define __CONTROLLER_H_INCLUDED__
+
 #include "ros/ros.h"
 
 #define DEADZONE 3200
@@ -30,4 +33,4 @@ std::string name;
 
 void prepare_packet_write(char *, ros::Publisher);
 
-
+#endif

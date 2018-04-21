@@ -15,6 +15,17 @@
 #include <errno.h>   // Error number definitions
 #include <termios.h> // POSIX terminal control definitions
 
+/*
+* This file is the code for the controller ros module
+* It sends out a new packet every time a joystick event occurs(joystick moved, button pressed)
+* TODO: 
+*   - add support for more than one joystick
+*   - make a better function for building data packets
+*   - resolve wierd descrepency between joystick.h definitions and F310 stick numbers
+*   - integrate with luke's communication module
+*   - live scan for radio and controller(s)
+*/
+
 #define DEADZONE 3200
 
 // for the rover
@@ -452,6 +463,7 @@ bool testy()
 
 void prepare_packet_write(char *buffer)
 {
+  tcflush(descriptor, TCIOFLUSH);
   char transmit_data[8];
   transmit_data[0] = 0xFF;
   transmit_data[FRONT_LEFT + 1] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
@@ -475,12 +487,18 @@ void prepare_packet_write(char *buffer)
   //sum = buffer[FRONT_LEFT] + buffer[MID_LEFT] + buffer[BACK_LEFT] + buffer[FRONT_RIGHT] + buffer[MID_RIGHT] + buffer[BACK_RIGHT];
 
   transmit_data[7] = sum + 0xAA;
+
+  for(int i = 0; i < 8; i++) {
+    ROS_INFO("%d: %d", i, transmit_data[i]);
+  }
   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
+
   ::write(descriptor, transmit_data, 8);
 }
 
 void prepare_arm_packet_write(char *buffer)
 {
+  tcflush(descriptor, TCIOFLUSH);
   char transmit_data[8];
   transmit_data[0] = 0xFF;
   transmit_data[BASE_ARM] = buffer[BASE_ARM] + 127;
@@ -771,6 +789,8 @@ int main(int argc, char **argv)
       }
       else if (jse.type == 2)
       {
+
+        /*
         switch (jse.number)
         {
         case RS_X:
@@ -788,12 +808,15 @@ int main(int argc, char **argv)
         default:
           break;
         }
+        */
+
+       ROS_INFO("STICK: %d", jse.number);
 
         if (!toggleControl)
         {
           if (jse.number == LS_X || jse.number == LS_Y)
           {
-            ROS_INFO("Left stick");
+            ROS_INFO("Joy stick");
             char buffer[8];
             // buffer[HEADER] = 0xFF;
             buffer[FRONT_LEFT] = state.stickL_y / -256;
@@ -809,10 +832,11 @@ int main(int argc, char **argv)
 
           if (jse.number == RT)
           {
-            ROS_INFO("Left stick");
+            ROS_INFO("Right stick");
             char buffer[8];
             // buffer[HEADER] = 0xFF;
             //ROS_INFO("RIGHT TRIGGEr: %8hd",  state.rt);
+            ROS_INFO("RT: %d", state.rt);
             if (state.rt > 15000)
             {
               buffer[FRONT_LEFT] = 64;

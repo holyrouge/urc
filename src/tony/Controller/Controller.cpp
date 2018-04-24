@@ -123,7 +123,7 @@ int open_joystick()
 {
 
   std::ifstream jsFile; // a better name may be in order to avoid confusion
-  jsFile.open("../urc2018/src/tony/Controller/js.txt");
+  jsFile.open("../Documents/Dev/robotics/urc2018/src/tony/Controller/js.txt");
   char js[256];
 
   std::string line = "test";
@@ -132,6 +132,9 @@ int open_joystick()
     std::getline(jsFile, line);
     ROS_INFO(line.c_str());
   }
+
+  //ROS_INFO("Opening: %s", line.c_str());
+  //ROS_INFO("pwd: %s", system("pwd"));
 
   joystick_fd = open(line.c_str(), O_RDONLY | O_NONBLOCK); /* read write for force feedback? */
   if (joystick_fd < 0)
@@ -282,11 +285,17 @@ int get_joystick_status(js_event *jse, controller *cst)
     }
   }
 
+  //ROS_INFO("Left trigger: %d", cst->lt);
+  //ROS_INFO("Right stick: %d", cst->stickR_y);
+
+
+
   // } // Weird while loop
   //ROS_INFO("Pressed?: %d\n", cst->isPressed[0]);
   // printf("%d\n", wjse->stick1_y);
   return 0;
 }
+
 
 bool read(char *buffer, int numBytes)
 {
@@ -501,11 +510,11 @@ void prepare_arm_packet_write(char *buffer)
   tcflush(descriptor, TCIOFLUSH);
   char transmit_data[8];
   transmit_data[0] = 0xFF;
-  transmit_data[BASE_ARM] = buffer[BASE_ARM] + 127;
-  transmit_data[VERTICAL] = buffer[VERTICAL] + 127;
+  transmit_data[BASE_ARM] = buffer[BASE_ARM];
+  transmit_data[VERTICAL] = buffer[VERTICAL];
   transmit_data[VERTICAL_TOGGLE] = buffer[VERTICAL_TOGGLE];
-  transmit_data[WRIST_PITCH] = buffer[WRIST_PITCH] + 127;
-  transmit_data[WRIST_ROTATION] = buffer[WRIST_ROTATION] + 127;
+  transmit_data[WRIST_PITCH] = buffer[WRIST_PITCH];
+  transmit_data[WRIST_ROTATION] = buffer[WRIST_ROTATION];
   transmit_data[HAND_CONTROL] = buffer[HAND_CONTROL];
 
   for (int i = 1; i < 7; i++)
@@ -522,6 +531,12 @@ void prepare_arm_packet_write(char *buffer)
 
   transmit_data[7] = sum + 0xBB;
   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
+
+   for(int i = 0; i < 8; i++) {
+    ROS_INFO("%d: %d", i, transmit_data[i]);
+  }for(int i = 0; i < 8; i++) {
+    ROS_INFO("%d: %d", i, transmit_data[i]);
+  }
   ::write(descriptor, transmit_data, 8);
 }
 

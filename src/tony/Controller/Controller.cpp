@@ -123,7 +123,7 @@ int open_joystick()
 {
 
   std::ifstream jsFile; // a better name may be in order to avoid confusion
-  jsFile.open("../Documents/Dev/robotics/urc2018/src/tony/Controller/js.txt");
+  jsFile.open("../urc2018/src/tony/Controller/js.txt");
   char js[256];
 
   std::string line = "test";
@@ -288,14 +288,11 @@ int get_joystick_status(js_event *jse, controller *cst)
   //ROS_INFO("Left trigger: %d", cst->lt);
   //ROS_INFO("Right stick: %d", cst->stickR_y);
 
-
-
   // } // Weird while loop
   //ROS_INFO("Pressed?: %d\n", cst->isPressed[0]);
   // printf("%d\n", wjse->stick1_y);
   return 0;
 }
-
 
 bool read(char *buffer, int numBytes)
 {
@@ -497,7 +494,8 @@ void prepare_packet_write(char *buffer)
 
   transmit_data[7] = sum + 0xAA;
 
-  for(int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; i++)
+  {
     ROS_INFO("%d: %d", i, transmit_data[i]);
   }
   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
@@ -532,9 +530,12 @@ void prepare_arm_packet_write(char *buffer)
   transmit_data[7] = sum + 0xBB;
   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
 
-   for(int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; i++)
+  {
     ROS_INFO("%d: %d", i, transmit_data[i]);
-  }for(int i = 0; i < 8; i++) {
+  }
+  for (int i = 0; i < 8; i++)
+  {
     ROS_INFO("%d: %d", i, transmit_data[i]);
   }
   ::write(descriptor, transmit_data, 8);
@@ -557,7 +558,7 @@ int main(int argc, char **argv)
   int fd, rc;
   int done = 0;
 
-  char killPacket[] = {'0','0','0','0','0','0','0','0'};
+  char killPacket[] = {'0', '0', '0', '0', '0', '0', '0', '0'};
   toggleControl = false; // by default we'll control the rover
   verticalControl = false;
 
@@ -680,48 +681,48 @@ int main(int argc, char **argv)
           prepare_packet_write(buffer);
         }
 
-        if (jse.number == A)
-        {
-          ROS_INFO("A pressed");
-          char buffer[8];
-          buffer[BASE_ARM] = 0;
-          buffer[VERTICAL_TOGGLE] = 0;
-          buffer[VERTICAL] = 0;
-          buffer[WRIST_PITCH] = 0;
-          buffer[WRIST_ROTATION] = 0;
-          buffer[HAND_CONTROL] = state.isPressed[A];
+        // if (jse.number == A)
+        // {
+        //   ROS_INFO("A pressed");
+        //   char buffer[8];
+        //   buffer[BASE_ARM] = 0;
+        //   buffer[VERTICAL_TOGGLE] = 0;
+        //   buffer[VERTICAL] = 0;
+        //   buffer[WRIST_PITCH] = 0;
+        //   buffer[WRIST_ROTATION] = 0;
+        //   buffer[HAND_CONTROL] = (state.isPressed[A] == 1 ? 2 : 0);
 
-          ROS_INFO("A: %d", buffer[HAND_CONTROL]);
-          prepare_arm_packet_write(buffer);
-        }
+        //   ROS_INFO("A: %d", buffer[HAND_CONTROL]);
+        //   prepare_arm_packet_write(buffer);
+        // }
 
-        if (jse.number == X)
-        {
-          ROS_INFO("X pressed");
-          char buffer[8];
-          buffer[BASE_ARM] = 0;
-          buffer[VERTICAL_TOGGLE] = 0;
-          buffer[VERTICAL] = 0;
-          buffer[WRIST_PITCH] = 0;
-          buffer[WRIST_ROTATION] = 0;
-          buffer[HAND_CONTROL] = state.isPressed[X];
+        // if (jse.number == X)
+        // {
+        //   ROS_INFO("X pressed");
+        //   char buffer[8];
+        //   buffer[BASE_ARM] = 0;
+        //   buffer[VERTICAL_TOGGLE] = 0;
+        //   buffer[VERTICAL] = 0;
+        //   buffer[WRIST_PITCH] = 0;
+        //   buffer[WRIST_ROTATION] = 0;
+        //   buffer[HAND_CONTROL] = state.isPressed[X];
 
-          prepare_arm_packet_write(buffer);
-        }
+        //   prepare_arm_packet_write(buffer);
+        // }
 
-        if (jse.number == Y)
-        {
-          ROS_INFO("Y pressed");
-          char buffer[8];
-          buffer[BASE_ARM] = 0;
-          buffer[VERTICAL_TOGGLE] = 0;
-          buffer[VERTICAL] = 0;
-          buffer[WRIST_PITCH] = 0;
-          buffer[WRIST_ROTATION] = 0;
-          buffer[HAND_CONTROL] = 0;
+        // if (jse.number == Y)
+        // {
+        //   ROS_INFO("Y pressed");
+        //   char buffer[8];
+        //   buffer[BASE_ARM] = 0;
+        //   buffer[VERTICAL_TOGGLE] = 0;
+        //   buffer[VERTICAL] = 0;
+        //   buffer[WRIST_PITCH] = 0;
+        //   buffer[WRIST_ROTATION] = 0;
+        //   buffer[HAND_CONTROL] = 0;
 
-          prepare_arm_packet_write(buffer);
-        }
+        //   prepare_arm_packet_write(buffer);
+        // }
 
         switch (jse.number)
         {
@@ -749,17 +750,17 @@ int main(int argc, char **argv)
         ROS_INFO("RIGHT Bumper is Pressed");
         else
           ROS_INFO("RIGHT Bumper is NOT Pressed");*/
-        case LB:
-          if (state.isPressed[LB] == 1) 
-          {
-            ROS_INFO("LB Pressed");
-            verticalControl = !verticalControl;
-          }
-          else 
-          {
-            ROS_INFO("LB not pressed");
-          }
-          break;
+        // case LB:
+        //   if (state.isPressed[LB] == 1)
+        //   {
+        //     ROS_INFO("LB Pressed");
+        //     verticalControl = !verticalControl;
+        //   }
+        //   else
+        //   {
+        //     ROS_INFO("LB not pressed");
+        //   }
+        //   break;
         case SELECT:
           if (state.isPressed[SELECT] == 1)
           {
@@ -780,6 +781,110 @@ int main(int argc, char **argv)
           {
             ROS_INFO("rover");
             prepare_arm_packet_write(killPacket);
+          }
+          break;
+        case A:
+          if (state.isPressed[A] == 1)
+          {
+            ROS_INFO("A PRESSED");
+            char buffer[8];
+            buffer[BASE_ARM] = 1;
+            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          else
+          {
+            ROS_INFO("A RELEASED");
+            char buffer[8];
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          break;
+        case X:
+          if (state.isPressed[X] == 1)
+          {
+            ROS_INFO("X PRESSED");
+            char buffer[8];
+            buffer[BASE_ARM] = 2;
+            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          else
+          {
+            ROS_INFO("X RELEASED");
+            char buffer[8];
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          break;
+        case Y:
+          if (state.isPressed[Y] == 1)
+          {
+            ROS_INFO("Y PRESSED");
+            char buffer[8];
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 1;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          else
+          {
+            ROS_INFO("Y RELEASED");
+            char buffer[8];
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          break;
+        case LB:
+          if (state.isPressed[LB] == 1)
+          {
+            ROS_INFO("LB PRESSED");
+            char buffer[8];
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 2;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
+          }
+          else
+          {
+            ROS_INFO("LB RELEASED");
+            char buffer[8];
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL] = 0;
+            buffer[WRIST_PITCH] = 0;
+            buffer[WRIST_ROTATION] = 0;
+            buffer[HAND_CONTROL] = 0;
+            prepare_arm_packet_write(buffer);
           }
           break;
         case START:
@@ -825,7 +930,7 @@ int main(int argc, char **argv)
         }
         */
 
-       ROS_INFO("STICK: %d", jse.number);
+        ROS_INFO("STICK: %d", jse.number);
 
         if (!toggleControl)
         {
@@ -908,17 +1013,22 @@ int main(int argc, char **argv)
         {
           char buffer[8]; // let's keep everything at a uniform size for now
 
-          buffer[BASE_ARM] = state.stickL_x / -256;
-          buffer[VERTICAL] = state.stickL_y / -256;
+          //buffer[BASE_ARM] = state.stickL_x / -256;
+          // buffer[VERTICAL] = state.stickL_y / -256;
           buffer[WRIST_PITCH] = state.stickR_y / -256;
-          buffer[WRIST_ROTATION] = state.stickR_x / -256;
-          buffer[HAND_CONTROL] = 0;
+          buffer[WRIST_ROTATION] = state.stickL_y / -256;
+          buffer[HAND_CONTROL] = state.stickL_x / -256;
 
-          if (verticalControl) {
+          if (verticalControl)
+          {
             buffer[VERTICAL_TOGGLE] = 1;
-          } else if (!verticalControl) {
+          }
+          else if (!verticalControl)
+          {
             buffer[VERTICAL_TOGGLE] = 0;
-          } else {
+          }
+          else
+          {
             buffer[VERTICAL_TOGGLE] = 0;
           }
 

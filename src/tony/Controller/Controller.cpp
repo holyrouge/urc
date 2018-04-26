@@ -497,9 +497,12 @@ void prepare_packet_write(char *buffer)
 
   transmit_data[7] = sum + 0xAA;
 
+   printf("motor mode: ");
+
   for(int i = 0; i < 8; i++) {
-    ROS_INFO("%d: %d", i, transmit_data[i]);
+    printf("%d ", (unsigned char) transmit_data[i]);
   }
+  printf("\n");
   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
 
   ::write(descriptor, transmit_data, 8);
@@ -532,11 +535,11 @@ void prepare_arm_packet_write(char *buffer)
   transmit_data[7] = sum + 0xBB;
   //ROS_INFO("Speed:%d",state.stickL_y/-1024);
 
-   for(int i = 0; i < 8; i++) {
-    ROS_INFO("%d: %d", i, transmit_data[i]);
-  }for(int i = 0; i < 8; i++) {
-    ROS_INFO("%d: %d", i, transmit_data[i]);
+  printf("arm mode: ");
+  for(int i = 0; i < 8; i++) {
+    printf("%d ",  (unsigned char) transmit_data[i]);
   }
+  printf("\n");
   ::write(descriptor, transmit_data, 8);
 }
 

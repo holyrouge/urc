@@ -640,7 +640,7 @@ int main(int argc, char **argv)
   // ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
   // ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
 
-  ros::Rate loop_rate(1000);
+  ros::Rate loop_rate(500);
 
   if (testy())
     ROS_INFO("Radio Opened Successfully!");

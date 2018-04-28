@@ -639,7 +639,7 @@ int main(int argc, char **argv)
   // ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
   // ros::Publisher chatter_struct = n.advertise<beginner_tutorials::coord>("chatter_struct", 1000);
 
-  ros::Rate loop_rate(1000);
+  ros::Rate loop_rate(500);
 
   if (testy())
     ROS_INFO("Radio Opened Successfully!");
@@ -678,6 +678,7 @@ int main(int argc, char **argv)
           buffer[BACK_RIGHT] = 0;
 
           prepare_packet_write(buffer);
+          prepare_arm_packet_write(buffer);
         }
 
         // if (jse.number == A)
@@ -788,7 +789,7 @@ int main(int argc, char **argv)
             ROS_INFO("A PRESSED");
             char buffer[8];
             buffer[BASE_ARM] = 1;
-            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[VERTICAL_TOGGLE] = 1;
             buffer[VERTICAL] = 0;
             buffer[WRIST_PITCH] = 0;
             buffer[WRIST_ROTATION] = 0;
@@ -813,8 +814,8 @@ int main(int argc, char **argv)
           {
             ROS_INFO("X PRESSED");
             char buffer[8];
-            buffer[BASE_ARM] = 2;
-            buffer[VERTICAL_TOGGLE] = 0;
+            buffer[BASE_ARM] = 0;
+            buffer[VERTICAL_TOGGLE] = 2;
             buffer[VERTICAL] = 0;
             buffer[WRIST_PITCH] = 0;
             buffer[WRIST_ROTATION] = 0;
@@ -840,7 +841,7 @@ int main(int argc, char **argv)
             ROS_INFO("Y PRESSED");
             char buffer[8];
             buffer[BASE_ARM] = 0;
-            buffer[VERTICAL_TOGGLE] = 1;
+            buffer[VERTICAL_TOGGLE] = 3;
             buffer[VERTICAL] = 0;
             buffer[WRIST_PITCH] = 0;
             buffer[WRIST_ROTATION] = 0;
@@ -866,7 +867,7 @@ int main(int argc, char **argv)
             ROS_INFO("LB PRESSED");
             char buffer[8];
             buffer[BASE_ARM] = 0;
-            buffer[VERTICAL_TOGGLE] = 2;
+            buffer[VERTICAL_TOGGLE] = 4;
             buffer[VERTICAL] = 0;
             buffer[WRIST_PITCH] = 0;
             buffer[WRIST_ROTATION] = 0;
@@ -1017,6 +1018,7 @@ int main(int argc, char **argv)
           buffer[WRIST_PITCH] = state.stickR_y / -256;
           buffer[WRIST_ROTATION] = state.stickL_y / -256;
           buffer[HAND_CONTROL] = state.stickL_x / -256;
+          buffer[BASE_ARM] = state.stickR_x / -256;
 
           if (verticalControl)
           {
@@ -1034,6 +1036,7 @@ int main(int argc, char **argv)
           ROS_INFO("VToggle: %u", buffer[VERTICAL_TOGGLE]);
           ROS_INFO("Stick: %d", buffer[VERTICAL]);
           ROS_INFO("CLamp: %d", buffer[HAND_CONTROL]);
+          ROS_INFO("Base: %d", buffer[BASE_ARM]);
 
           prepare_arm_packet_write(buffer);
         }

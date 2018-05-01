@@ -5,7 +5,6 @@
 
 #define DEADZONE 3200
 
-
 // #define HEADER      0
 #define FRONT_LEFT  0
 #define FRONT_RIGHT 1
@@ -23,7 +22,6 @@
 #define WRIST_ROTATION 5
 #define HAND_CONTROL 6
 
-
 //1 OR -1
 #define FRONT_LEFT_SIGN 1
 #define MID_LEFT_SIGN   -1
@@ -39,7 +37,11 @@
 std::string name;
 
 
+void prep_pub_motormsg(char *, ros::Publisher);
+void prep_pub_armmsg(char *, ros::Publisher);
 
-void prepare_packet_write(char *, ros::Publisher);
+// REMOVE THESE AFTER MAIN CODE FULLY ACCOMODATES PUBLISHING 
+void prepare_packet_write(char *); 
+void prepare_arm_packet_write(char *);
 
 #endif

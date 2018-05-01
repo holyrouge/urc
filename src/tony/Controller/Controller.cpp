@@ -258,21 +258,22 @@ int get_joystick_status(js_event *jse, controller *cst)
 }
 
 
-/* Calculates checksum and prepares data packet for SAR video movement
+/* 
 *
-* This is not written to be modified easily... it assumes a few things.
-* Takes in array of 6 speeds of motors, adds init data, and checksum. 
+* Takes in array of 6 speeds of motors and adds init data.
 * Also multiplies some things by negative 1 if motors are plugged in
 * backwards. 
+* Writes data to motor.msg. 
+* Header, Length, and Magic Number already defined in motor.msg
+* Communication will prep header and checksum and actually write packet to radio
 *
 * pub: publisher to publish data
 * buffer: data to publish
-*
-* 4/6/18: Writes data to motor.msg. 
 */
-void prepare_packet_write(char *buffer, ros::Publisher pub) {
-  int len = 6;
-  char transmit_data[len];
+void prep_pub_motormsg(char *buffer, ros::Publisher pub) {
+  tony::motor msg;
+  int len = msg.NUM_BYTES;
+  char transmit_data[len]; 
   transmit_data[FRONT_LEFT] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
   transmit_data[MID_LEFT] = buffer[MID_LEFT] * MID_LEFT_SIGN;
   transmit_data[BACK_LEFT] = buffer[BACK_LEFT] * BACK_LEFT_SIGN;
@@ -280,13 +281,47 @@ void prepare_packet_write(char *buffer, ros::Publisher pub) {
   transmit_data[MID_RIGHT] = buffer[MID_RIGHT] * MID_RIGHT_SIGN;
   transmit_data[BACK_RIGHT] = buffer[BACK_RIGHT] * BACK_RIGHT_SIGN;
 
-  motor msg;
+  for (int i = 0; i < len; i++)
+    if (transmit_data[i] == 255)
+      transmit_data[i] = 254;
+
   for(int i = 0; i < len; i++)
     msg.motor_packet[i] = transmit_data[i];
   pub.publish(msg);
   return;
  }
 
+/* 
+* Writes data to arm.msg. 
+* Header, Length, and Magic Number already defined in arm.msg
+* Communication will prep header and checksum and actually write packet to radio
+*
+* pub: publisher to publish data
+* buffer: data to publish
+*/
+void prep_pub_armmsg(char *buffer, ros::Publisher pub) {
+  tony::arm msg; 
+  int len = msg.NUM_BYTES;
+  char transmit_data[len]; 
+  //-1 added to fit in 6 len array. Maybe need to modify constants?
+  transmit_data[BASE_ARM-1] = buffer[BASE_ARM] + 127;
+  transmit_data[VERTICAL-1] = buffer[VERTICAL] + 127;
+  transmit_data[VERTICAL_TOGGLE-1] = buffer[VERTICAL_TOGGLE];
+  transmit_data[WRIST_PITCH-1] = buffer[WRIST_PITCH] + 127;
+  transmit_data[WRIST_ROTATION-1] = buffer[WRIST_ROTATION] + 127;
+  transmit_data[HAND_CONTROL-1] = buffer[HAND_CONTROL];
+
+  for (int i = 0; i < len; i++)
+    if (transmit_data[i] == 255)
+      transmit_data[i] = 254;
+
+  for(int i = 0; i < len; i++)
+    msg.arm_packet[i] = transmit_data[i];
+  pub.publish(msg);  
+  return;
+ }
+
+//REMOVE
 void prepare_packet_write(char *buffer)
 {
   char transmit_data[8];
@@ -316,6 +351,7 @@ void prepare_packet_write(char *buffer)
   ::write(descriptor, transmit_data, 8);
 }
 
+//REMOVE
 void prepare_arm_packet_write(char *buffer)
 {
   char transmit_data[8];
@@ -353,7 +389,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "talker");
   ros::NodeHandle n;
 
-  ros::Publisher controller_pub = n.advertise<controller>("controller_data", 1000);
+  ros::Publisher controller_pub = n.advertise<controller>("arm_data", 1000);
   ros::Publisher controller_pub_motor = n.advertise<motor>("motor_data", 1000);
 
   controller state;

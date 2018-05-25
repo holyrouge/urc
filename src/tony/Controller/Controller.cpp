@@ -1,4 +1,3 @@
-#include "ros/ros.h"
 #include <sstream>
 #include "joystick.h"
 #include <stdio.h>
@@ -15,45 +14,7 @@
 #include <errno.h>   // Error number definitions
 #include <termios.h> // POSIX terminal control definitions
 
-/*
-* This file is the code for the controller ros module
-* It sends out a new packet every time a joystick event occurs(joystick moved, button pressed)
-* TODO: 
-*   - add support for more than one joystick
-*   - make a better function for building data packets
-*   - resolve wierd descrepency between joystick.h definitions and F310 stick numbers
-*   - integrate with luke's communication module
-*   - live scan for radio and controller(s)
-*/
-
-#define DEADZONE 3200
-
-// for the rover
-// #define HEADER      0
-#define FRONT_LEFT 0
-#define FRONT_RIGHT 1
-#define MID_LEFT 2
-#define MID_RIGHT 3
-#define BACK_LEFT 4
-#define BACK_RIGHT 5
-//#define CHECKSUM
-
-// for the arm
-#define BASE_ARM 1
-#define VERTICAL_TOGGLE 2
-#define VERTICAL 3
-#define WRIST_PITCH 4    // right y axis
-#define WRIST_ROTATION 5 // right x axis
-#define HAND_CONTROL 6   // X or B
-
-//1 OR -1
-#define FRONT_LEFT_SIGN 1
-#define MID_LEFT_SIGN -1
-#define BACK_LEFT_SIGN -1
-
-#define FRONT_RIGHT_SIGN 1
-#define MID_RIGHT_SIGN -1
-#define BACK_RIGHT_SIGN -1
+#include "controller.h"
 
 /**
  * Make sure to include the standard types for any messages you send and any
@@ -63,10 +24,15 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
 #include "tony/controller.h"
+#include "tony/arm.h"
+#include "tony/motor.h"
 
 using namespace tony;
 
+//File descriptor initialized to -1 because it is unopened
 static int joystick_fd = -1;
+
+// These are given by how xboxdrv data show up
 
 const int A = 0;
 const int B = 1;
@@ -87,10 +53,6 @@ const int RT = 4;
 const int LT = 5;
 const int DPAD_X = 6;
 const int DPAD_Y = 7;
-/**
-     * The name of the Device in the filesystem.
-     */
-std::string name;
 
 /**
      * The file descriptor of the Device. This will be any
@@ -119,6 +81,8 @@ bool toggleControl;
 
 bool verticalControl;
 
+
+//Opens xboxcontroller as a file
 int open_joystick()
 {
 
@@ -145,6 +109,7 @@ int open_joystick()
   return joystick_fd;
 }
 
+// Reads most recent controler event into js_event struct
 int read_joystick_event(struct js_event *jse)
 {
   int bytes;
@@ -162,6 +127,8 @@ int read_joystick_event(struct js_event *jse)
   return -1;
 }
 
+
+//Closes xbox controller file when done for good practice
 void close_joystick()
 {
   close(joystick_fd);
@@ -170,7 +137,8 @@ void close_joystick()
 int get_joystick_status(js_event *jse, controller *cst)
 {
   int rc;
-  // struct js_event jse;
+  
+  // controller is not open, failure
   if (joystick_fd < 0)
     return -1;
 
@@ -294,178 +262,35 @@ int get_joystick_status(js_event *jse, controller *cst)
   return 0;
 }
 
-bool read(char *buffer, int numBytes)
-{
 
-  int bytesRead = 0;
-
-  while (numBytes > 0)
-  {
-
-    bytesRead = ::read(descriptor, buffer, numBytes);
-
-    if (bytesRead > 0)
-    {
-
-      buffer += bytesRead;
-      numBytes -= bytesRead;
-    }
-    else
-    {
-
-      ROS_INFO("No bytes read from device.");
-    }
-  }
-
-  // Return whether any bytes have been read.
-  if (numBytes > 0)
-    return false;
-  else
-    return true;
-}
-
-/*
-bool read(std::vector<byte>& bytes) {
-
-  // Grab the number of bytes to read, and a pointer to the buffer.
-  uint32 numBytes = bytes.size();
-  byte* bytePtr   = bytes.data();
-  
-  // Continue to read bytes until the desired number have been read, or until
-  // the read returns 0 bytes.
-  int bytesRead = 0;
-  while(numBytes > 0) {
-
-    bytesRead = ::read(descriptor, bytePtr, numBytes);
-
-    if(bytesRead == 0) break;
-    else if (bytesRead == -1) {
-      std::cout << "`read()` failed: " << errno << " Shit is fucked up." << std::endl;
-      break;
-    }
-
-    bytePtr += bytesRead;
-    numBytes -= bytesRead;
-
-  }
-
-  #ifdef DEBUG
-
-    // DEBUG: Indicate the bytes read from the device.
-    std::cout << "Bytes read from " << name << ": [";
-
-    for(auto c = bytes.begin(); c != bytes.end(); ++c) {
-
-      printf(" 0x%x", (int)(*c));
-
-    }
-
-    std::cout << "]" << std::endl;
-  #endif
-
-  // Return whether any bytes have been read.
-  if(numBytes > 0)
-    return true;
-  else
-    return false;
-
-}
-
+/* Calculates checksum and prepares data packet for SAR video movement
+*
+* This is not written to be modified easily... it assumes a few things.
+* Takes in array of 6 speeds of motors, adds init data, and checksum. 
+* Also multiplies some things by negative 1 if motors are plugged in
+* backwards. 
+*
+* pub: publisher to publish data
+* buffer: data to publish
+*
+* 4/6/18: Writes data to motor.msg. 
 */
+void prepare_packet_write(char *buffer, ros::Publisher pub) {
+  int len = 6;
+  char transmit_data[len];
+  transmit_data[FRONT_LEFT] = buffer[FRONT_LEFT] * FRONT_LEFT_SIGN;
+  transmit_data[MID_LEFT] = buffer[MID_LEFT] * MID_LEFT_SIGN;
+  transmit_data[BACK_LEFT] = buffer[BACK_LEFT] * BACK_LEFT_SIGN;
+  transmit_data[FRONT_RIGHT] = buffer[FRONT_RIGHT] * FRONT_RIGHT_SIGN;
+  transmit_data[MID_RIGHT] = buffer[MID_RIGHT] * MID_RIGHT_SIGN;
+  transmit_data[BACK_RIGHT] = buffer[BACK_RIGHT] * BACK_RIGHT_SIGN;
 
-bool testy()
-{
-
-  // Copy over the indicated baud rate.
-  //int baudRate = 115200;
-  int parity = 0; //must be 0
-  bool shouldBlock = false;
-  int timeout = 100000;
-  // Make sure that we can change the file attributes.
-  descriptor = open("/dev/ttyACM0", O_RDWR);
-  if (descriptor == -1)
-  {
-    ROS_INFO("FUCK");
-    return false;
-  }
-
-  opened = true;
-
-  if (!opened)
-  {
-
-    return false;
-  }
-
-  // Make sure the device is a serial device.
-  if (!isatty(descriptor))
-  {
-
-    return false;
-  }
-
-  // Create tele-type struct and zero out data.
-  struct termios tty;
-  memset(&tty, 0, sizeof(tty));
-
-  // Grab attributes for the current serial port.
-  if (tcgetattr(descriptor, &tty) != 0)
-  {
-
-    ROS_INFO("Device: Could not load attributes from device.");
-    return false;
-  }
-
-  // Flush the port.
-  tcflush(descriptor, TCIOFLUSH);
-
-  // Save the termios attributes for later.
-  saveTty = tty;
-  setTty = true;
-
-  // Set the baud rate.
-  cfsetspeed(&tty, 115200);
-  //cfsetospeed (&tty, B115200);
-  //cfsetispeed (&tty, B115200);
-
-  // Make the serial port "raw".
-  cfmakeraw(&tty);
-
-  // Input flags.
-  tty.c_iflag |= IGNPAR | BRKINT;         // enable break processing
-  tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
-
-  // Ouptput Flags
-  tty.c_oflag = 0; // no remapping, no delays
-
-  // Control Flags.
-  tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8; // 8-bit chars
-  tty.c_cc[VMIN] = (shouldBlock) ? 1 : 0;     // Indicate blocking.
-  tty.c_cc[VTIME] = timeout;                  // 0.timeout seconds.
-  tty.c_cflag |= CLOCAL;                      // ignore modem controls,
-  tty.c_cflag |= CREAD;                       // enable reading
-  tty.c_cflag &= ~(PARENB | PARODD);          // shut off parity
-  tty.c_cflag |= parity;                      // Set parity.
-  tty.c_cflag &= ~CSTOPB;
-  tty.c_cflag &= ~CRTSCTS;
-
-  // Disable Local Flags.
-  tty.c_lflag = 0;
-
-  // Set the attributes for the current serial port.
-  if (tcsetattr(descriptor, TCSANOW, &tty) != 0)
-  {
-
-    ROS_INFO("Could not save attributes to device.");
-    return false;
-  }
-
-  // Flush the port.
-  tcflush(descriptor, TCIOFLUSH);
-
-  // Successfully configured the port.
-  return true;
-}
+  motor msg;
+  for(int i = 0; i < len; i++)
+    msg.motor_packet[i] = transmit_data[i];
+  pub.publish(msg);
+  return;
+ }
 
 void prepare_packet_write(char *buffer)
 {
@@ -544,12 +369,13 @@ void prepare_arm_packet_write(char *buffer)
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
 int main(int argc, char **argv)
-{
+ {
 
   ros::init(argc, argv, "talker");
   ros::NodeHandle n;
 
   ros::Publisher controller_pub = n.advertise<controller>("controller_data", 1000);
+  ros::Publisher controller_pub_motor = n.advertise<motor>("motor_data", 1000);
 
   controller state;
   //Joystick stuff
@@ -562,44 +388,22 @@ int main(int argc, char **argv)
   verticalControl = false;
 
   struct js_event jse;
-  // struct wwvi_js_event wjse;
-  // struct controller_state cst;
 
-  for (int i = 0; i < 11; i++)
-  {
-    // cst.isPressed[i] =false;
-    state.isPressed[i] = false;
+// Initialize controller stuff 
+  for(int i=0; i<11;i++){
+  // cst.isPressed[i] =false;
+    state.isPressed[i]=false;
   }
 
-  state.stickL_x = 0;
-  state.stickL_y = 0;
-  state.stickR_x = 0;
-  state.stickR_y = 0;
-  state.dpad_x = 0;
-  state.dpad_y = 0;
-  state.lt = 0;
-  state.rt = 0;
-  state.type = 0;
-
-  // A = state.A;
-  // B = state.B;
-  // X = state.X;
-  // Y = state.Y;
-  // RB = state.RB;
-  // LB = state.LB;
-  // SELECT = state.SELECT;
-  // START = state.START;
-  // XBOX = state.XBOX;
-  // R3 = state.R3;
-
-  // LS_X = state.LS_X;
-  // LS_Y = state.LS_Y;
-  // RS_X = state.RS_X;
-  // RS_Y = state.RS_Y;
-  // RT = state.RT;
-  // LT = state.LT;
-  // DPAD_X = state.DPAD_X;
-  // DPAD_Y = state.DPAD_Y;
+  state.stickL_x=0;
+  state.stickL_y=0;
+  state.stickR_x=0;
+  state.stickR_y=0;
+  state.dpad_x=0;
+  state.dpad_y=0;
+  state.lt=0;
+  state.rt=0;
+  state.type=0;
 
   state.NUM_BUTTONS;
 
@@ -613,6 +417,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
+<<<<<<< HEAD
   /**
    * The advertise() function is how you tell ROS that you want to
    * publish on a given topic name. This invokes a call to the ROS
@@ -641,11 +446,6 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(500);
 
-  if (testy())
-    ROS_INFO("Radio Opened Successfully!");
-  else
-    ROS_INFO("Radio Could not open");
-
   /**
    * A count of how many messages we have sent. This is used to create
    * a unique string for each message.
@@ -653,6 +453,7 @@ int main(int argc, char **argv)
   int count = 0;
   while (ros::ok())
   {
+
     rc = read_joystick_event(&jse);
 
     // usleep(1000);

@@ -62,6 +62,8 @@ find_package(catkin REQUIRED COMPONENTS
    raw_imus.msg
    raw_science.msg
    controller.msg
+   arm.msg
+   motor.msg
  )
 
 ## Generate services in the 'srv' folder

@@ -88,7 +88,7 @@ int open_joystick()
 
   std::ifstream jsFile; // a better name may be in order to avoid confusion
   jsFile.open("../urc2018/src/tony/Controller/js.txt");
-  char js[256];
+  //char js[256];
 
   std::string line = "test";
   if (jsFile.is_open())
@@ -136,11 +136,10 @@ void close_joystick()
 
 int get_joystick_status(js_event *jse, controller *cst)
 {
-  int rc;
-  
   // controller is not open, failure
-  if (joystick_fd < 0)
+  if (joystick_fd < 0) {
     return -1;
+  }
 
   // memset(wjse, 0, sizeof(
   // ROS_INFO("Hello");
@@ -416,8 +415,8 @@ int main(int argc, char **argv)
   controller state;
   //Joystick stuff
 
-  int fd, rc;
-  int done = 0;
+  int fd_controller, rc;
+  //int done = 0;
 
   char killPacket[] = {'0', '0', '0', '0', '0', '0', '0', '0'};
   toggleControl = false; // by default we'll control the rover
@@ -441,19 +440,17 @@ int main(int argc, char **argv)
   state.rt=0;
   state.type=0;
 
-  state.NUM_BUTTONS;
+  //state.NUM_BUTTONS;
 
   controller_pub.publish(state);
 
-  fd = open_joystick();
+  fd_controller = open_joystick();
 
-  if (fd < 0)
+  if (fd_controller < 0)
   {
-    ROS_INFO("Controller failed to open.\n");
+    ROS_INFO("Controller failed to open. Shutting down!\n");
     exit(1);
   }
-
-<<<<<<< HEAD
   /**
    * The advertise() function is how you tell ROS that you want to
    * publish on a given topic name. This invokes a call to the ROS

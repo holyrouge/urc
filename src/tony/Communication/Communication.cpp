@@ -220,7 +220,8 @@ int main(int argc, char **argv) {
   ros::Subscriber arm_sub = n.subscribe("arm_data", q_size, arm_function);
   ros::Subscriber motor_sub = n.subscribe("motor_data", q_size, motor_function);
   
-  int count = 0;
+  open_radio();
+
   while (ros::ok())
   {
     //sendheartbeat()

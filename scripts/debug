@@ -1,0 +1,74 @@
+#!/bin/bash
+
+if [ "$1" == "help" ]; then	
+	echo "Runs various packages with debugger."
+	echo "Usage: ./scripts/debug [-gdb OR -gui OR nothing] [-d] [p1] [-d] [p2] | if first param is -gdb or -gui launches with those. Otherwise launches with cgdb. Every package with -d before it launches in its own debugging window. Others launch and run live"
+	echo "Usage: ./scripts/debug -d [package1] -d [package2] [packag3] | launches cgdb debugging package1 and 2, with package 3 running without debugger "
+	echo "Usage: ./scripts/debug -gdb -d [package1] -d [package2] [packag3] | launches gdb debugging package1 and 2, with package 3 running without debugger "
+	echo "Usage: ./scripts/debug -gui -d [package1]  | launches gdbgui with package1 - not throughly tested "
+
+    exit
+fi
+
+
+# Let script run from top level or scripts folder
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
+MAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=-Wall -DCMAKE_C_FLAGS=-Wall"
+
+if [ $SCRIPTPATH == `pwd` ]; then
+  cd ..
+fi
+
+source `pwd`/devel/setup.bash
+
+
+lower_case=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+# if [ "$lower_case" == "tony" ]; then
+# 	roslaunch ./launch/tony.launch
+# 	exit
+# fi
+
+launch_file="./launch/dummy_debug.launch"
+
+echo "<launch>" > $launch_file
+
+
+debug_arg=false
+gui=false
+gdb=false
+for arg in "$@"; do
+	lower_case=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+
+	if [ $lower_case == "-d" ]; then
+		debug_arg=true
+		continue
+  	else
+  		if [ $lower_case == "-gui" ]; then
+			gui=true
+			continue
+		if [ $lower_case == "-gdv" ]; then
+			gdb=true
+			continue
+  		else
+	  		if $debug_arg; then
+				debug_arg=false
+	  			if $gui; then
+	  				echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"gdbgui\"/>" >> $launch_file
+	  			else
+	  				if $gdb; then
+	  					echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"xterm -e cgdb -ex start --args\"/>" >> $launch_file
+	  				else
+	  					echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" launch-prefix=\"xterm -e gdb -ex start --args\"/>" >> $launch_file
+	  				fi
+	  			fi
+			else
+				echo "<node name=\"$lower_case\" pkg=\"tony\" type=\"$lower_case\" output=\"screen\" />" >> $launch_file
+			fi
+	fi
+
+done
+echo "</launch>" >> $launch_file
+
+
+sudo ./scripts/manual_launch dummy_debug

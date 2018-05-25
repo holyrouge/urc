@@ -9,8 +9,7 @@
  */
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
-#include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
-#include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
+#include "tony/dummy.h" // see beginner_tutorials/msg/dummy.msg
 
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
@@ -60,7 +59,6 @@ int main(int argc, char **argv)
   ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
   // ros::Publisher chatter_pub_int = n.advertise<std_msgs::Int8>("chatter_int", 1000);
   ros::Publisher dummy_pub = n.advertise<dummy>("chatter_dummy", 1000);
-  ros::Publisher gps_channel = n.advertise<raw_gps>("gps", 1000);
 
   ros::Rate loop_rate(10);
 
@@ -108,13 +106,6 @@ int main(int argc, char **argv)
     sample.no_size_demo.push_back(7899);
     dummy_pub.publish(sample);
 
-    raw_gps gps;
-    gps.raw_gps_data.push_back(0);
-    gps.raw_gps_data.push_back(50);
-    gps.size_gps_data[0];
-    // gps.size_gps_data.push_back(50);
-
-    gps_channel.publish(gps);
 
     // Call this at end of "doing stuff"
     ros::spinOnce();

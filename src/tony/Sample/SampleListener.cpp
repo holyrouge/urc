@@ -3,9 +3,6 @@
 #include <std_msgs/Int8.h>
 
 #include "tony/dummy.h" // see beginner_tutorials/msg/coord.msg
-#include "tony/raw_gps.h" // see beginner_tutorials/msg/coord.msg
-#include "./GPS.h"
-
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
  */
@@ -35,13 +32,6 @@ void chatterCallbackDummy(const dummy::ConstPtr& msg)
   for(unsigned int i = 0; i < msg->no_size_demo.size(); i++) {
     ROS_INFO("non fixed[%d] = %d", i, msg->no_size_demo[i]);
   }
-}
-
-void gpsCallback(const raw_gps::ConstPtr& msg)
-{
-  // *(msg->raw_gps_data);
-  ROS_INFO("GPS array is: [%d]", msg->raw_gps_data[0]);
-  ROS_INFO("GPS array is: [%d]", msg->size_gps_data[0]);
 }
 
 int main(int argc, char **argv)
@@ -86,7 +76,6 @@ int main(int argc, char **argv)
   ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
   // ros::Subscriber sub_int = n.subscribe("chatter_int", 1000, chatterCallback_int);
   ros::Subscriber dummy_subscriber = n.subscribe("chatter_dummy", 1000, chatterCallbackDummy);
-  ros::Subscriber sub_gps = n.subscribe("gps", 1000, gpsCallback);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all

@@ -61,6 +61,9 @@ find_package(catkin REQUIRED COMPONENTS
    raw_imu.msg
    raw_imus.msg
    raw_science.msg
+   controller.msg
+   arm.msg
+   motor.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -241,3 +244,7 @@ add_dependencies(science tony_generate_messages_cpp)
 add_executable(sample Sample/Sample.cpp)
 target_link_libraries(sample ${catkin_LIBRARIES})
 add_dependencies(sample tony_generate_messages_cpp)
+
+add_executable(sample_listener Sample/SampleListener.cpp)
+target_link_libraries(sample_listener ${catkin_LIBRARIES})
+add_dependencies(sample_listener tony_generate_messages_cpp)

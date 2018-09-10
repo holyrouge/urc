@@ -9,7 +9,7 @@ Will Update Soon...<br />
 
 Tutorials for UNIX/Linux, Git, C++ and ROS are in the Google Team Drive (SBRT_General).
 
-## Folder structure
+## Folder Structure
 ======================
 
 urc <br />

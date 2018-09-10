@@ -1,28 +1,23 @@
-Last Updated May-25-2018 <br/>
+Last Updated September 09-10-2018 <br/>
 Author: Prangon Ghose - Software Team Leader <prangon.ghose@stonybrook.edu>
 
-## Project README
-======================
+## URC Mars Rover -- Cullen
 
-# DO FIRST
-======================
+# Do First
 
-Start with doc/install_ros_gazebo
-<br/>
-Then go to doc/running_demo_1
-<br/>
+Will Update Soon...<br />
+
 Tutorials for UNIX/Linux, Git, C++ and ROS are in the Google Team Drive (SBRT_General).
 
 # Folder structure
 ======================
 
-urc                         
-	build
-	devel
-	doc
-	scripts
-	src
-		beginner_tutorials
-		tony
+urc <br />
+* build <br />
+* devel <br />
+* docs <br />
+* launch <br />
+* scripts <br />
+* src <br />
 
-There are basic things to read in the doc folder. Build and devel are created by running catkin_make the first time. 
+# Will Update Soon...

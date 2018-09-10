@@ -1,1 +1,0 @@
-#define hi 5

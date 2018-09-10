@@ -1,4 +1,0 @@
-cd ../src/tony/Controller/
-rm js.txt
-ls /dev/input/js* | xargs echo >> js.txt
-

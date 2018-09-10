@@ -1,3 +1,0 @@
-<launch>
-  <node name="communication" pkg="tony" type="communication" output="screen" />
-</launch>

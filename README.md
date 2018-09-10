@@ -1,15 +1,15 @@
 Last Updated September 09-10-2018 <br/>
 Author: Prangon Ghose - Software Team Leader <prangon.ghose@stonybrook.edu>
 
-## URC Mars Rover -- Cullen
+# URC Mars Rover -- Cullen
 
-# Do First
+## Do First
 
 Will Update Soon...<br />
 
 Tutorials for UNIX/Linux, Git, C++ and ROS are in the Google Team Drive (SBRT_General).
 
-# Folder structure
+## Folder structure
 ======================
 
 urc <br />
@@ -20,4 +20,4 @@ urc <br />
 * scripts <br />
 * src <br />
 
-# Will Update Soon...
+## Will Update Soon...

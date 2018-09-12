@@ -1,11 +1,10 @@
 from node import Node
+from pubsub import r
 
 class Sub2(Node):
     def __init__(self):
         super().__init__()
  
     def run(self):
-        count = 0
-        while count < 100:
-            print(self.getName() + " is running")
-            count += 1
+       for x in range(5):
+            r.publish('sub2:cmd1', 'twiddle some bits')

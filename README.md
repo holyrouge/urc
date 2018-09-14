@@ -1,3 +1,15 @@
-# Just some random testing stuff
-
-Make sure to [install Redis](https://redis.io/topics/quickstart) and `pip install redis`. Run `redis-server` before running main.py and use `redis-cli` combined with `PUBLISH {channel} {message}` to test the print loop, which currently subscribes to all channels.
+Author: Prangon Ghose - Software Team Leader <prangon.ghose@stonybrook.edu>
+# URC Mars Rover -- Cullen
+## Do First
+Will Update Soon...<br />
+Tutorials for UNIX/Linux, Git, C++ and ROS are in the Google Team Drive (SBRT_General).
+## Folder Structure
+======================
+urc <br />
+* build <br />
+* devel <br />
+* docs <br />
+* launch <br />
+* scripts <br />
+* src <br />
+## Will Update Soon...

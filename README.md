@@ -14,7 +14,6 @@ If you have any questions and/or concerns, please contact the Software Team Lead
 Tutorials for UNIX/Linux, Git and C++ are in the Google Team Drive (SBRT_General). Python tutorials will be posted at a later time.
 
 ## Folder Structure
-======================
 urc <br />
 * docs <br />
 * launch <br />

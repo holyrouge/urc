@@ -4,6 +4,7 @@ Author: Prangon Ghose - Software Team Leader <prangon.ghose@stonybrook.edu>
 # URC Mars Rover -- Cullen
 ## Description
 The urc repository is the primary repository for code running on the base station of Cullen, SBRT's URC 2019 Mars Rover. The programs are primarily written in Python using the Redis library. <br />
+<br />
 If you have any questions and/or concerns, please contact the Software Team Lead, Prangon Ghose, at <prangon.ghose@stonybrook.edu>.
 
 ## Do First

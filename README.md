@@ -7,13 +7,13 @@ The urc repository is the primary repository for code running on the base statio
 <br />
 If you have any questions and/or concerns, please contact the Software Team Lead, Prangon Ghose, at <prangon.ghose@stonybrook.edu>.
 
-## Do First
+## Initialization
 * Install Redis (INSTALL_REDIS.md)
 * Install Dependencies (TBD)
 
 Tutorials for UNIX/Linux, Git and C++ are in the Google Team Drive (SBRT_General). Python tutorials will be posted at a later time.
 
-## Folder Structure
+## Repository Structure
 urc <br />
 * docs <br />
 * launch <br />

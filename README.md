@@ -1,4 +1,4 @@
-Last Updated: 09-15-2018 - 7:52 PM
+Last Updated: 09-15-2018 - 7:52 PM <br />
 Author: Prangon Ghose - Software Team Leader <prangon.ghose@stonybrook.edu>
 
 # URC Mars Rover -- Cullen

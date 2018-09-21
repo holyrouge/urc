@@ -1,0 +1,12 @@
+{
+    "nodes": [
+        {
+            "id": "comms",
+            "path": "sample/path"
+        },
+        {
+            "id": "input",
+            "path": "other/path"
+        }
+     ]
+}

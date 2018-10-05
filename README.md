@@ -12,7 +12,7 @@ If you have any questions and/or concerns, please contact the Software Team Lead
 
 Tutorials for UNIX/Linux, Git and C++ are in the Google Team Drive (SBRT_General). Python tutorials will be posted at a later time. <br />
 <br />
-To learn more about 0MQ (our communication framework), go to 0MQ [http://zeromq.org/].
+To learn more about 0MQ (our communication framework), go to <http://zeromq.org/>.
 
 ## Repository Structure
 cullen-basestation <br />

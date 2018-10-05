@@ -1,0 +1,5 @@
+{
+    "protocol": "inproc",
+    "port": "inputs",
+    "pattern": "pub"
+}

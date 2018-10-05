@@ -1,2 +1,2 @@
-redis==2.10.6
+pyzmq==17.1.2
 inputs==0.4

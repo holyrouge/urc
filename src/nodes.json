@@ -1,5 +1,14 @@
 {
-    "nodes" : [
+    "nodes": [
         {
+            "id": "inputs",
+            "path": "inputs/"
+        },
+        {
+            "id": "motion",
+            "path": "motion/"
+        }
+    ]
+}
 
 

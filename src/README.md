@@ -8,8 +8,6 @@ In your node, be sure to extend the 'node' class provided here.
 
 # Getting Started
 
-You will need to have redis-server already installed to run any of the code. 
-Remote instances of redis-server can probably work as well.
 To install any dependencies, run `pip install -r requirements.txt` in the `src` directory.
 
 # Contributing

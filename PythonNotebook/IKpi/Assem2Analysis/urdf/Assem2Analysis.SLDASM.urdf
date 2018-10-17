@@ -1,0 +1,255 @@
+<robot
+  name="Assem2Analysis.SLDASM">
+  <link
+    name="basicArmModel">
+    <inertial>
+      <origin
+        xyz="-0.051263 -0.067091 -7.8118E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.21854" />
+      <inertia
+        ixx="6.2344E-05"
+        ixy="8.498E-05"
+        ixz="-4.9069E-20"
+        iyy="0.00015735"
+        iyz="4.1386E-20"
+        izz="0.00021969" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/basicArmModel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/basicArmModel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Top_Link">
+    <inertial>
+      <origin
+        xyz="-0.17164 0.086539 4.1248E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.003435" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Top_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Top_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Top_Joint"
+    type="fixed">
+    <origin
+      xyz="0.0015681 0 -0.18369"
+      rpy="1.5708 0.73406 -5.5245E-17" />
+    <parent
+      link="basicArmModel" />
+    <child
+      link="Top_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Middle_Link">
+    <inertial>
+      <origin
+        xyz="-4.4835E-06 0.0178 -3.1324E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.14148" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Middle_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Middle_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Middle_Joint"
+    type="fixed">
+    <origin
+      xyz="-0.085641 0 -0.049486"
+      rpy="-1.5708 1.1092 -3.1416" />
+    <parent
+      link="basicArmModel" />
+    <child
+      link="Middle_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Bottom_Link">
+    <inertial>
+      <origin
+        xyz="5.5511E-17 0.011 1.5811E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.0068452" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Bottom_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Bottom_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Bottom_Joint"
+    type="fixed">
+    <origin
+      xyz="-0.05498 0 -0.10266"
+      rpy="1.5708 -0.10405 6.3939E-18" />
+    <parent
+      link="basicArmModel" />
+    <child
+      link="Bottom_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Base_Link">
+    <inertial>
+      <origin
+        xyz="0.024825 0.017928 3.742E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.066779" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Base_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Assem2Analysis.SLDASM/meshes/Base_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Base_Joint"
+    type="fixed">
+    <origin
+      xyz="-0.035749 0 -0.10642"
+      rpy="1.5708 -0.0027547 1.6867E-19" />
+    <parent
+      link="basicArmModel" />
+    <child
+      link="Base_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

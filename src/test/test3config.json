@@ -1,0 +1,10 @@
+{
+    "id": "sample 3",
+    "protocol": "tcp",
+    "port": "5556",
+    "model": "reqrep",
+
+    "topics": [
+        { "1": "req" }
+    ]
+}

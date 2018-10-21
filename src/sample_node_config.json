@@ -1,0 +1,11 @@
+{
+    "id": "sample",
+    "protocol": "tcp",
+    "port": "5556",
+    "model": "pubsub",
+
+    "topics": [
+        { "arm": "pub" },
+        { "inputs": "sub" }
+    ]
+}

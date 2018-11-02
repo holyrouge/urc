@@ -1,8 +1,11 @@
 import json
 from pprint import pprint
 
-import pubsub
 import params
+import importlib
+
+
+
 
 if __name__ == "__main__":
 
@@ -17,8 +20,9 @@ if __name__ == "__main__":
     loaded_nodes = []
 
     for entry in node_data['nodes']:
-        _tmp = __import__(entry['path'])
-        loaded_nodes.append(_tmp.object)
+        _tmp = importlib.import_module(entry['path'])
+        c = getattr(_tmp, entry['node'])
+        loaded_nodes.append(c(entry['config']))
         print("loaded node: " + entry['id'])
 
     for node in loaded_nodes:
@@ -26,12 +30,3 @@ if __name__ == "__main__":
         node.start()
         print(node.__class__.__name__ + " started")
 
-    try:
-        pubsub.p.psubscribe("*")
-
-        while True:
-            msg = pubsub.p.get_message()
-            if msg:
-                print(msg)
-    except KeyboardInterrupt:
-        pass

@@ -2,11 +2,15 @@
     "nodes": [
         {
             "id": "comms",
-            "path": "sample/path"
+            "path": "comms.communication",
+            "node": "communication",
+            "config": "comms/comms_config.json"
         },
         {
             "id": "input",
-            "path": "other/path"
+            "path": "input.input",
+            "node": "input",
+            "config": "input/input_config.json"
         }
      ]
 }

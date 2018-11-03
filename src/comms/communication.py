@@ -6,10 +6,12 @@ class communication(Node):
         Node.__init__(self, configPath)
         print("comms initialized!")
 
-    def run(self):
+    def send_msg(self, msg):
+        print("Transmitting: " + msg)
 
-        def send_msg(msg):
-            print("Transmitting: " + msg)
+    def loop(self):
+        self.recv("comms", self.send_msg)
 
-        while True:
-            self.recv("comms", send_msg)
+    def shutdown(self):
+        print("properly overriden shutdown method")
+

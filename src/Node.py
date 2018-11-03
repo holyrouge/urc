@@ -1,6 +1,7 @@
 import json
 import zmq
 from threading import Thread
+from threading import Event
 
 class Node(Thread):
 
@@ -17,10 +18,74 @@ class Node(Thread):
         f = open(configPath)
         self.configPath = configPath
         self.configData = json.load(f)
+        f.close()
         self.id = self.configData['id']
         self.context = zmq.Context()
         self.topics = {}
         self.initzmq()
+        self._stop_event = Event()
+
+    def stop(self):
+
+        """ This method sets the stop flag
+
+        The node should safely shut down after this flag is set
+        """
+
+        self._stop_event.set()
+
+    def stopped(self):
+
+        """ Returns the value of the stopped flag
+
+        """
+
+        return self._stop_event.is_set()
+
+    def run(self):
+
+        """ This will be the node's main loop
+
+        Everyone should override the loop and shutdown methods.
+        """
+
+        while True:
+
+            if (self.stopped() == True):
+                print(self.id + " shutting down...")
+                self.stopzmq()
+                self.shutdown()
+                break
+            else:
+                self.loop()
+
+    def stopzmq(self):
+
+        """ Shuts down all zmq stuff
+
+
+        """
+
+        self.context.destroy()
+
+    def shutdown(self):
+
+        """ Gets called when the node is told to stop
+
+        Everyone should override this for good practice
+        """
+
+        print(self.id + " needs an overridden shutdown method!")
+
+    def loop(self):
+
+        """ The main node code that gets executed every loop
+
+        This is the method that should be overridden for the node to do stuff
+        So help me God if anyone overrides this and puts a while true in there
+        """
+
+        print(self.id + " needs an overridden loop method")
 
     # TODO: allow more than one model to be used
     # TODO: look into using different protocols
@@ -89,6 +154,7 @@ class Node(Thread):
         """
         self.topics[topic].send_string(req)
         msg =  self.topics[topic].recv_string()
+        print(msg)
         callback(msg)
 
     def reply(self, topic, callback):

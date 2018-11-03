@@ -7,8 +7,11 @@ class input(Node):
         Node.__init__(self, configPath)
         print("input initialized!")
 
-    def run(self):
-        while True:
-            msg = "input!"
-            msg = msg + " " + str(time.time())
-            self.send("comms", msg)
+    def loop(self):
+        msg = input("input: ")
+        msg = msg + " " + str(time.time())
+        self.send("comms", msg)
+
+    def shutdown(self):
+        print("properly written shutdown method")
+

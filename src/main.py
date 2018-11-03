@@ -4,7 +4,7 @@ from pprint import pprint
 import params
 import importlib
 
-
+import time
 
 
 if __name__ == "__main__":
@@ -30,3 +30,12 @@ if __name__ == "__main__":
         node.start()
         print(node.__class__.__name__ + " started")
 
+    while True:
+        try:
+            time.sleep(0.0001)
+        except KeyboardInterrupt:
+            print("Closing down...")
+            for node in loaded_nodes:
+                node.stop()
+                node.join()
+            break

@@ -1,11 +1,23 @@
 {
     "id": "sample",
-    "protocol": "tcp",
-    "port": "5556",
-    "model": "pubsub",
-
     "topics": [
-        { "arm": "pub" },
-        { "inputs": "sub" }
+        {
+            "arm": "pub",
+            "protocol": "tcp",
+            "port": "5556",
+            "model": "pubsub"
+        },
+        {
+            "inputs": "sub",
+            "protocol": "tcp",
+            "port": "5556",
+            "model": "pubsub"
+        },
+        {
+            "comms": "req",
+            "protocol": "udp",
+            "port": "7777",
+            "model": "reqrep"
+        }
     ]
 }

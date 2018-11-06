@@ -2,9 +2,10 @@ import json
 import zmq
 from threading import Thread
 from threading import Event
+from status import Status
+
 
 class Node(Thread):
-
     """This is the class that will be the base of every node object
 
     Each node will read a config file in JSON format to initialize zmq sockets.
@@ -24,6 +25,7 @@ class Node(Thread):
         self.topics = {}
         self.initzmq()
         self._stop_event = Event()
+        self.status = Status.RUNNING
 
     def stop(self):
 
@@ -49,15 +51,22 @@ class Node(Thread):
         Everyone should override the loop and shutdown methods.
         """
 
-        while True:
+        try:
+            while True:
 
-            if (self.stopped() == True):
-                print(self.id + " shutting down...")
-                self.stopzmq()
-                self.shutdown()
-                break
-            else:
-                self.loop()
+                if (self.stopped() == True):
+                    print(self.id + " shutting down...")
+                    self.stopzmq()
+                    self.shutdown()
+                    self.status = Status.STOPPED
+                    break
+                else:
+                    self.loop()
+        except Exception:
+            self.status = Status.CRASHED
+            self.savedata()
+            self.stopzmq()
+            self.shutdown()
 
     def stopzmq(self):
 
@@ -67,6 +76,15 @@ class Node(Thread):
         """
 
         self.context.destroy()
+
+    def savedata(self):
+        print("override this to save data on event of a crash")
+
+    def loaddata(self):
+        print("override this to reload data on the event of a restart")
+
+    def restart(self):
+        print("override this to do anything special for restarting the node")
 
     def shutdown(self):
 
@@ -103,7 +121,7 @@ class Node(Thread):
             raise Exception("Topics or port not found in %s" % self.configPath)
 
         for topic in self.configData['topics']:
-            for x,y in topic.items():
+            for x, y in topic.items():
                 if y == "pub" or y == "rep":
                     if y == "pub":
                         socket = self.context.socket(zmq.PUB)
@@ -130,9 +148,9 @@ class Node(Thread):
 
         The first argument is the topic to send the message on and the second is the message body
         """
-        self.topics[topic].send_string("%s %s" % (topic,msg))
+        self.topics[topic].send_string("%s %s" % (topic, msg))
 
-    #TODO: implement a timeout
+    # TODO: implement a timeout
     def recv(self, topic, callback):
 
         """This method is used to receive messages for the sub pattern
@@ -153,7 +171,7 @@ class Node(Thread):
         The third argument is a callback function to process the reply from the server. The reply will be a string
         """
         self.topics[topic].send_string(req)
-        msg =  self.topics[topic].recv_string()
+        msg = self.topics[topic].recv_string()
         print(msg)
         callback(msg)
 

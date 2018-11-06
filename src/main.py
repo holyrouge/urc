@@ -5,6 +5,7 @@ import params
 import importlib
 
 import time
+from status import Status
 
 
 if __name__ == "__main__":
@@ -39,3 +40,13 @@ if __name__ == "__main__":
                 node.stop()
                 node.join()
             break
+        for node in loaded_nodes:
+            if node.status == Status.CRASHED:
+                print(node.id + " has crashed, attempting to restart")
+                conf = ""
+                for entry in node_data['nodes']:
+                    if entry['id'] == node.id:
+                        conf = entry['config']
+                node.__init__(conf)
+                node.start()
+                print("restarted node: " + node.id)

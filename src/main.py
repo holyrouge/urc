@@ -1,8 +1,12 @@
 import json
 from pprint import pprint
 
-import pubsub
 import params
+import importlib
+
+import time
+from status import Status
+
 
 if __name__ == "__main__":
 
@@ -17,8 +21,9 @@ if __name__ == "__main__":
     loaded_nodes = []
 
     for entry in node_data['nodes']:
-        _tmp = __import__(entry['path'])
-        loaded_nodes.append(_tmp.object)
+        _tmp = importlib.import_module(entry['path'])
+        c = getattr(_tmp, entry['node'])
+        loaded_nodes.append(c(entry['config']))
         print("loaded node: " + entry['id'])
 
     for node in loaded_nodes:
@@ -26,12 +31,22 @@ if __name__ == "__main__":
         node.start()
         print(node.__class__.__name__ + " started")
 
-    try:
-        pubsub.p.psubscribe("*")
-
-        while True:
-            msg = pubsub.p.get_message()
-            if msg:
-                print(msg)
-    except KeyboardInterrupt:
-        pass
+    while True:
+        try:
+            time.sleep(0.0001)
+        except KeyboardInterrupt:
+            print("Closing down...")
+            for node in loaded_nodes:
+                node.stop()
+                node.join()
+            break
+        for node in loaded_nodes:
+            if node.status == Status.CRASHED:
+                print(node.id + " has crashed, attempting to restart")
+                conf = ""
+                for entry in node_data['nodes']:
+                    if entry['id'] == node.id:
+                        conf = entry['config']
+                node.__init__(conf)
+                node.start()
+                print("restarted node: " + node.id)

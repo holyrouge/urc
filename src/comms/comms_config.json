@@ -1,0 +1,10 @@
+{
+    "id": "comms",
+    "protocol": "tcp",
+    "port": "5556",
+    "model": "pubsub",
+
+    "topics": [
+        { "comms": "sub" }
+    ]
+}

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package joystick;
+
+message JSMessage {
+    sint32 id = 1;
+
+    message JSButton {
+        int32 id = 1;
+        bool is_pressed = 2;
+    }
+
+    message JSAxis {
+        sint32 id = 1;
+        sint32 value = 2;
+    }
+
+    message JSHat {
+        sint32 id = 1;
+        sint32 value = 2;
+    }
+
+    repeated JSButton buttons = 2;
+    repeated JSAxis axes = 3;
+    repeated JSHat hats = 4;
+
+}

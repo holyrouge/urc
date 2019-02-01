@@ -15,7 +15,7 @@
         },
         {
             "comms": "req",
-            "protocol": "udp",
+            "protocol": "tcp",
             "port": "7777",
             "model": "reqrep"
         }

@@ -1,1 +1,1 @@
-config_path = 'test_config.json'
+config_path = 'proto_test_config.json'

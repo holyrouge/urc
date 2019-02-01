@@ -3,7 +3,7 @@ from pprint import pprint
 
 import params
 import importlib
-
+import sys
 import time
 from status import Status
 
@@ -17,7 +17,7 @@ if __name__ == "__main__":
         node_data = json.load(f)
 
     pprint(node_data)
-    
+
     loaded_nodes = []
 
     for entry in node_data['nodes']:
@@ -39,7 +39,8 @@ if __name__ == "__main__":
             for node in loaded_nodes:
                 node.stop()
                 node.join()
-            break
+            sys.exit()
+
         for node in loaded_nodes:
             if node.status == Status.CRASHED:
                 print(node.id + " has crashed, attempting to restart")
@@ -50,3 +51,6 @@ if __name__ == "__main__":
                 node.__init__(conf)
                 node.start()
                 print("restarted node: " + node.id)
+
+
+

@@ -1,5 +1,6 @@
 import json
 import zmq
+import traceback
 from threading import Thread
 from threading import Event
 from status import Status
@@ -64,6 +65,7 @@ class Node(Thread):
                     self.loop()
         except Exception:
             self.status = Status.CRASHED
+            traceback.print_exc()
             self.savedata()
             self.stopzmq()
             self.shutdown()
@@ -172,7 +174,6 @@ class Node(Thread):
         """
         self.topics[topic].send_string(req)
         msg = self.topics[topic].recv_string()
-        print(msg)
         callback(msg)
 
     def reply(self, topic, callback):

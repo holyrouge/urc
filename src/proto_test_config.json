@@ -1,0 +1,16 @@
+{
+    "nodes": [
+        {
+            "id": "input",
+            "path": "input.input",
+            "node": "input",
+            "config": "input/input_config.json"
+        },
+        {
+            "id": "comms",
+            "path": "comms.communication",
+            "node": "communication",
+            "config": "comms/comms_config.json"
+        }
+    ]
+}

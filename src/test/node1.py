@@ -10,7 +10,7 @@ if (len(sys.argv) > 1):
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
-socket.bind("tcp://*:%s" % port)
+socket.bind("tcp://*:%s" % port) # tcp://5556
 
 while True:
     message = socket.recv()

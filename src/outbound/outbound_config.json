@@ -1,0 +1,13 @@
+{
+    "id": "sample",
+    "protocol": "tcp",
+    "port": "5555",
+    "model": "pubsub",
+    "topics": [
+        {
+            "outbound": "sub"
+        }
+    ],
+    "comport": "/dev/ttyUSB0",
+    "baudrate": "115200"
+}

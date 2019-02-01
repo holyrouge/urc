@@ -1,6 +1,8 @@
 from Node import Node
 import time
 import random
+from messages.jsdata_pb2 import JSMessage
+
 
 class input(Node):
     def __init__(self, configPath):
@@ -8,9 +10,11 @@ class input(Node):
         print("input initialized!")
 
     def loop(self):
-        msg = input("input: ")
-        msg = msg + " " + str(time.time())
-        self.send("comms", msg)
+        # self.get_input()
+        # msg = self.inp
+        msg = JSMessage()
+        msg.id = random.randint(0, 10)
+        self.send("comms", msg.SerializeToString())
 
     def shutdown(self):
         print("properly written shutdown method")

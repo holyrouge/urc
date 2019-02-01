@@ -1,0 +1,11 @@
+{
+    "id": "joystick",
+    "port": "5555",
+    "model": "pubsub",
+    "protocol": "tcp",
+    "topics": [
+        {
+            "outbound": "pub"
+        }
+    ]
+}

@@ -1,2 +1,3 @@
-pyzmq==17.1.2
-inputs==0.4
+pyzmq
+PySDL2
+
